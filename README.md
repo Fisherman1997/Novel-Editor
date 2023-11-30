@@ -13,25 +13,25 @@ An Electron application with Vue and TypeScript
 ### Install
 
 ```bash
-$ yarn
+$ npm i
 ```
 
 ### Development
 
 ```bash
-$ yarn dev
+$ npm dev
 ```
 
 ### Build
 
 ```bash
 # For windows
-$ yarn build:win
+$ npm build:win
 
 # For macOS
-$ yarn build:mac
+$ npm build:mac
 
 # For Linux
-$ yarn build:linux
+$ npm build:linux
 ```
 

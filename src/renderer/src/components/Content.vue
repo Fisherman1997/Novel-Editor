@@ -44,7 +44,6 @@ const nextText= async (ev, index: number) => {
 		content.splice(index, 1)
 		nextTick(() => {
             switchFocus(list![index - 1], false)
-            // selection?.setPosition(list![index - 1], list![index - 1].innerText.length)
 		})
 	} else if (ev.key ===  'ArrowUp' && caretPos === 0 && list![index - 1]) {
         switchFocus(list![index - 1], false)
@@ -71,13 +70,16 @@ const liFocus = async (ev) => {
     switchFocus(list[list.length - 1], false)
 }
 
-
+/**
+ * 
+ * @param element 光标所在节点
+ * @param type 设置为 false 将光标置于文本末尾，设置为 true 将光标置于文本开头  
+ */
 const switchFocus = (element: HTMLElement, type: boolean) => {
     const selection = window.getSelection();  
     const range = document.createRange();  
-    // 设置光标位置到文本末尾  
     range.selectNodeContents(element);  
-    range.collapse(type); // 设置为 false 将光标置于文本末尾，设置为 true 将光标置于文本开头  
+    range.collapse(type);
     selection!.removeAllRanges();  
     selection!.addRange(range);  
 }
