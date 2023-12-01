@@ -53,8 +53,7 @@ const nextText= async (ev, index: number) => {
 }
 const changeText = (ev, index: number) => {
 	// ev.preventDefault();
-	const targetText = ev.target.innerText.split('/n').join('')
-	content[index] = targetText.split('/n').join('')
+	content[index] = ev.target.innerText.split('/n').join('')
 }
 
 const total = computed(() => {
@@ -85,7 +84,8 @@ const switchFocus = (element: HTMLElement, type: boolean) => {
 }
 
 const Jump = (url) => {
-    (window.api! as any).newWin(url)
+    // (window.api! as any).newWin(url)
+    window.electron.ipcRenderer.send('new-window',url)
 }
 </script>
 

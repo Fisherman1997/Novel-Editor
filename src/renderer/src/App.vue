@@ -1,7 +1,7 @@
 <template>
 	<div class="main">
 		<div class="left">
-			123
+			<p>{{ currentInfo.character }}</p>
 		</div>
 		<Content />
 		<div class="right">
@@ -10,7 +10,11 @@
 	</div>
 </template>
 <script setup lang="ts">
+import { reactive } from 'vue';
+import { CurrentInfo } from './utils/types'
 import Content from './components/Content.vue';
+
+const currentInfo = reactive(new CurrentInfo('新书'))
 </script>
 
 <style lang="less">
