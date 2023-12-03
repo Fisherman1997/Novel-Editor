@@ -1,7 +1,8 @@
 <template>
+	<Header></Header>
 	<div class="main">
 		<div class="left">
-			<p>{{ currentInfo.character }}</p>
+			<p>{{ currentInfo.name }}</p>
 		</div>
 		<Content />
 		<div class="right">
@@ -12,6 +13,7 @@
 <script setup lang="ts">
 import { reactive } from 'vue';
 import { CurrentInfo } from './utils/types'
+import Header from './components/Header.vue';
 import Content from './components/Content.vue';
 
 const currentInfo = reactive(new CurrentInfo('新书'))
@@ -21,7 +23,7 @@ const currentInfo = reactive(new CurrentInfo('新书'))
 @import './assets/css/styles.less';
 .main{
 	width: 100vw;
-	height: 100vh;
+	height: calc(100vh - 30px);
 	overflow: hidden;
 	display: flex;
 	justify-content: center;

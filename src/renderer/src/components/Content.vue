@@ -1,13 +1,13 @@
 <template>
     <div class="content">
-        <ul @click="liFocus">
+        <div class="text" @click="liFocus">
             <li 
                 v-for="(text,index) in content"	
                 contenteditable="true" 
                 :style="{ fontSize: styles.fontSize + 'px' }"
                 @input="(ev) => changeText(ev, index)"
                 @keydown="(ev) => nextText(ev, index)">{{text}}</li>
-        </ul>
+        </div>
         <div class="footer">
             <div class="ctrl">
                 <span>size：{{ styles.fontSize }}</span>
@@ -26,7 +26,16 @@ import { nextTick, reactive, computed } from 'vue';
 const styles = reactive({
 	fontSize: 16
 })
+
+/**
+ * 文本存储数组
+ */
 const content = reactive([''])
+/**
+ *  光标换行及回车增、删除、光标跟随
+ * @param ev 
+ * @param index 当前元素下标
+ */
 const nextText= async (ev, index: number) => {
 	const targetText = ev.target.innerText.split('/n').join('')
 	const list = ev.target.parentNode?.getElementsByTagName('li')
@@ -37,13 +46,16 @@ const nextText= async (ev, index: number) => {
 		if (!targetText || !targetText.length) return
 		content.splice(index + 1, 0 , '')
 		nextTick(() => {
+            viewBottom(ev.target.parentNode, index + 1)
             switchFocus(list![index + 1], true)
 		})
 	} else if (ev.key === 'Backspace' && !targetText.length){
 		if (content.length <= 1) return
+		ev.preventDefault()
 		content.splice(index, 1)
 		nextTick(() => {
-            switchFocus(list![index - 1], false)
+            if (index === 0) switchFocus(list![index], true)
+            else switchFocus(list![index - 1], false)
 		})
 	} else if (ev.key ===  'ArrowUp' && caretPos === 0 && list![index - 1]) {
         switchFocus(list![index - 1], false)
@@ -51,9 +63,20 @@ const nextText= async (ev, index: number) => {
         switchFocus(list![index + 1], true)
     }
 }
+
+/**
+ * 新增编辑的项是最后倒数前三滚动跳到最底，反之不操作
+ * @param element 滚动元素
+ * @param index 元素下标
+ */
+const viewBottom = (element, index: number) => {
+    if (content.length - 4 < index)
+    element.scrollTop = element.scrollHeight 
+}
 const changeText = (ev, index: number) => {
 	// ev.preventDefault();
 	content[index] = ev.target.innerText.split('/n').join('')
+    viewBottom(ev.target.parentNode, index)
 }
 
 const total = computed(() => {
@@ -62,8 +85,11 @@ const total = computed(() => {
 	return result + '字'
 })
 
+/**
+ * 点击空白处焦点自动锁定最后项
+ */
 const liFocus = async (ev) => {
-    if (ev.target.nodeName !== 'UL') return
+    if (ev.target.className !== 'text') return
     // const sss = window.getSelection()
     const list = ev.target.getElementsByTagName('li')
     switchFocus(list[list.length - 1], false)
@@ -93,29 +119,32 @@ const Jump = (url) => {
 .content{
     box-shadow: 0 0 1px rgba(0, 0, 0, 0.5);
     position: relative;
-    background-color: #f0fff9;
+    background-color: #fcf6e9;
     width: 60%;
     // height: 100%;
     font-family: '小米兰亭', '微软雅黑';
     overflow: hidden;
     padding: 10px 10px 40px 10px;
-    ul {
-        height: 100%;
+    .text {
+        height: calc(100% - 20% - 20px);
+        padding-bottom: 20%;
         overflow-y: auto;
-    }
-    li{
-        display: block;
-        width: 100%;
-        white-space: normal;
-        // word-wrap: break-word;
-        // overflow-wrap: break-word; 
-        text-indent: 2em;
-        outline: none;
-        border: none;
-        margin-top: 10px;
-    }
-    li:focus{
-        background-color: rgb(241, 241, 241);
+        display: flex;
+        flex-direction: column;
+        li{
+            display: block;
+            width: 100%;
+            white-space: normal;
+            // word-wrap: break-word;
+            // overflow-wrap: break-word; 
+            text-indent: 2em;
+            outline: none;
+            border: none;
+            margin-top: 10px;
+        }
+        li:focus{
+            background-color: rgb(241, 241, 241);
+        }
     }
     .footer{
         display: flex;

@@ -5,11 +5,12 @@ import { electronAPI } from '@electron-toolkit/preload'
 const api = {
   newWin: (url: string) => {
     ipcRenderer.send('new-window', url)
+  },
+  changeWindow: (type: string) => {
+    return ipcRenderer.send(type)
   }
 }
-// Use `contextBridge` APIs to expose Electron APIs to
-// renderer only if context isolation is enabled, otherwise
-// just add to the DOM global.
+
 if (process.contextIsolated) {
   try {
     contextBridge.exposeInMainWorld('electron', electronAPI)
