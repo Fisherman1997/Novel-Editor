@@ -26,13 +26,6 @@ function createWindow(): void {
     shell.openExternal(details.url)
     return { action: 'deny' }
   })  
-  // 移动窗口
-  ipcMain.on('custom-adsorption', (event,res) => {
-    event || event
-    const { x, y } = res
-    const [xPosition, yPosition] = mainWindow.getPosition()  
-    mainWindow.setPosition(xPosition + x, yPosition + y)  
-  })
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
   } else {
