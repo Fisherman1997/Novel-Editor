@@ -3,6 +3,7 @@
 	<div class="main">
 		<div class="left">
 			<p>{{ currentInfo.name }}</p>
+			<button @click="save">新建</button>
 		</div>
 		<Content />
 		<div class="right">
@@ -17,6 +18,10 @@ import Header from './components/Header.vue';
 import Content from './components/Content.vue';
 
 const currentInfo = reactive(new CurrentInfo('新书'))
+
+const save = () => {
+	// console.log(window.electron.)
+}
 </script>
 
 <style lang="less">

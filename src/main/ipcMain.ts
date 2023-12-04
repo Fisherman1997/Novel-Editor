@@ -1,4 +1,5 @@
-import { BrowserWindow, ipcMain } from "electron"
+import { BrowserWindow, ipcMain, dialog } from "electron"
+import { writeFile, readFileSync } from 'fs'
 import { join } from 'path'
 
 export default () => {
@@ -47,8 +48,31 @@ export default () => {
 		const win = BrowserWindow.getFocusedWindow()
 		win?.minimize()
 	})
-	ipcMain.on('isFullScreen',() => {
+	
+	// // 监听保存文件事件  
+	ipcMain.on('read-file-path-main', (event, defaultPath) => {
 		const win = BrowserWindow.getFocusedWindow()
-		return win?.isFullScreen()
-	})
+		dialog.showSaveDialog( win!, {
+			title: '选择路径',
+			defaultPath
+		}).then(result => {
+			event.reply('get-file-path',result.filePath)
+		})
+	});  
+
+	ipcMain.on('save-file-main', (event, filePath: string, data: string) => {
+		writeFile(filePath, btoa(data),(err) => {
+			if (err) event.reply('save-file',false)
+			else event.reply('save-file',true)
+		})
+	});
+
+	ipcMain.on('read-file-main', (event, filePath: string) => {
+		try{
+			const result =  readFileSync(filePath)
+			event.reply('read-file', atob(result as any))
+		} catch{
+			dialog.showErrorBox('提示','新增失败请重新选择路径')
+		}
+	});
 }

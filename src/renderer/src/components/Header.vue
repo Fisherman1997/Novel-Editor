@@ -10,12 +10,9 @@
     </div>
 </template>
 <script setup lang="ts">
-import { onMounted } from 'vue'
-const windowApi: any = window.api
-onMounted(() => {
-    console.log(windowApi.changeWindow('isFullScreen'))
-})
+
 const changeWin = (type: string) => {
+    const windowApi: any = window.api
     console.log(windowApi.changeWindow('isFullScreen'))
     windowApi.changeWindow(type)
 }
