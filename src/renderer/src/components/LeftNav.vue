@@ -3,7 +3,7 @@
         <div class="nav">
             <button @click="openValue = true">新建</button>
             <button @click="openFile">打开</button>
-            <button @click="save" :style="{ backgroundColor: mainState.isChangeFile ? 'red': 'none' }">保存</button>
+            <button :disabled="mainState.isfile" @click="save" :style="{ backgroundColor: mainState.isChangeFile ? 'red': 'none' }">保存</button>
         </div>
         <div class="title">
             <input v-if="fileState.name && titileChange === true" v-model="fileState.name" type="text">
@@ -43,14 +43,21 @@ const fileName = ref('')
 const path = ref(mainState.defaultPath)
 const titileChange = ref(false)
 const openValue = ref(false)
-// const saveValue = ref(false)
-const open = () =>{
+
+const openInsert = () =>{
     if (openValue.value) return
     openValue.value = true
 }
+/**
+ * 保存当前文件
+ */
 const save = () => {
     window.electron.ipcRenderer.send('save-file-main', mainState.historicalFiles[0], fileState.getJosnElement())
+    mainState.changeFile('isChangeFile', false)
 }
+/**
+ * 新建文件啊
+ */
 const saveEnter = () => {
     if (!fileName.value) {
         ElMessage.warning('请输入书名')
@@ -64,23 +71,38 @@ const saveEnter = () => {
     window.electron.ipcRenderer.send('save-file-main', result, JSON.stringify(new CurrentInfo(fileName.value)))
     window.electron.ipcRenderer.on('save-file', (ev, resolve) => {
         ev || ev
-        if (resolve) window.electron.ipcRenderer.send('read-file-main', result)
+        if (resolve) {
+            window.electron.ipcRenderer.send('read-file-main', result)
+            mainState.changeFile('isfile', true)
+        }
         else ElMessage.error('新增失败')
     })
 }
 
+
+/**
+ * 打开文件
+ */
 const openFile = () => {
     window.electron.ipcRenderer.send('read-file-path-main', path.value, 'file')
 }
 
+/**
+ * 选择路径
+ */
 const changePath = () => {
     window.electron.ipcRenderer.send('read-file-path-main', path.value, 'dir')
 }
+
+
+// 监听读取文件
 window.electron.ipcRenderer.on('read-file',(ev, data: string) => {
     ev || ev
     const result = JSON.parse(data) as CurrentInfo
     fileState.openNewBook(result)
 })
+
+// 监听读取文件路径
 window.electron.ipcRenderer.on('read-file-path',(ev, value: string, type: 'dir' | 'file') => {
     ev || ev
     if (type === 'dir' ) mainState.changedefaultPath(value)
@@ -89,13 +111,16 @@ window.electron.ipcRenderer.on('read-file-path',(ev, value: string, type: 'dir' 
         let list = value.split('\\')
         list.pop()
         mainState.changedefaultPath(list.join('\\'))
+        window.electron.ipcRenderer.send('read-file-main', value)
     }
 })
+
+
 watch(() => mainState.defaultPath ,(newValue) =>{
     path.value = newValue
 })
 
-defineExpose({open, save})
+defineExpose({openInsert, save})
 </script>
 <style scoped lang="less">
 .left{

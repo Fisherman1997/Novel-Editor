@@ -10,18 +10,19 @@
 import { onMounted, onBeforeUnmount, ref } from 'vue'
 import Header from './components/Header.vue';
 import Content from './components/Content.vue';
-import LeftNav from './components/leftNav.vue';
+import LeftNav from './components/LeftNav.vue';
 import Right from './components/Right.vue';
 
 const leftNav = ref()
-// const { proxy } = getCurrentInstance()
+/**
+ * 全局快捷键
+ * @param event 
+ */
 const shortcut = (event) => {
-	// const $refs = instance!.appContext.config.globalProperties.$refs;
 	if (event.ctrlKey && event.key === 's') {
-		
+		leftNav.value.save()
 	} else if (event.ctrlKey && event.key === 'n'){
-		// console.log(leftNav.value!.openValue)
-		leftNav.value!.open()
+		leftNav.value.openInsert()
 	}
 }
 
