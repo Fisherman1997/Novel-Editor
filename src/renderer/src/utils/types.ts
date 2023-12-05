@@ -1,30 +1,38 @@
 
-// 章节
-type chaptertype = {
-    chapterName: string,
-    list: string[]
+/**
+ * 章节
+ */
+export type chaptertype = {
+    chapterName: string | null,
+    list: string[] | null
 }
 
-// 册
-type volumetype = {
-    volumeName: string,
+/**
+ * 册
+ */
+export type volumetype = {
+    volumeName: string | null,
     chapterList: chaptertype[]
 }
 
-// 世界观、设定
-type worldViewtype = {
-    name: string
-    setting: string[]
-    content: string
+/**
+ * 世界观、设定
+ */
+export type worldViewtype = {
+    name: string | null
+    setting: string[] | null
+    content: string | null
 }
 
-// 人物
-type characterType = {
-    name: string,
-    personality: string,
-    rventOfAppearance: string,
-    ageOfAppearance: string,
-    content: string
+/**
+ * 人物
+ */ 
+export type characterType = {
+    name: string | null,
+    personality: string | null,
+    rventOfAppearance: string | null,
+    ageOfAppearance: string | null,
+    content: string | null
 }
 
 
@@ -35,6 +43,9 @@ type characterType = {
 //     character: characterType[]
 // }
 
+/**
+ * 本书
+ */
 export class CurrentInfo {
     name: string
     volume: volumetype[]
@@ -47,5 +58,3 @@ export class CurrentInfo {
         this.character = character || []
     }
 }
-
-const a = new CurrentInfo('123')

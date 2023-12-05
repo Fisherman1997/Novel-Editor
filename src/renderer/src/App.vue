@@ -1,27 +1,37 @@
 <template>
 	<Header></Header>
 	<div class="main">
-		<div class="left">
-			<p>{{ currentInfo.name }}</p>
-			<button @click="save">新建</button>
-		</div>
+		<LeftNav ref="leftNav"/>
 		<Content />
-		<div class="right">
-			123
-		</div>
+		<Right />
 	</div>
 </template>
 <script setup lang="ts">
-import { reactive } from 'vue';
-import { CurrentInfo } from './utils/types'
+import { onMounted, onBeforeUnmount, ref } from 'vue'
 import Header from './components/Header.vue';
 import Content from './components/Content.vue';
+import LeftNav from './components/leftNav.vue';
+import Right from './components/Right.vue';
 
-const currentInfo = reactive(new CurrentInfo('新书'))
-
-const save = () => {
-	// console.log(window.electron.)
+const leftNav = ref()
+// const { proxy } = getCurrentInstance()
+const shortcut = (event) => {
+	// const $refs = instance!.appContext.config.globalProperties.$refs;
+	if (event.ctrlKey && event.key === 's') {
+		
+	} else if (event.ctrlKey && event.key === 'n'){
+		// console.log(leftNav.value!.openValue)
+		leftNav.value!.open()
+	}
 }
+
+onMounted(() => {
+	document.addEventListener('keydown', shortcut)
+	// leftNav.value!.opne()
+})
+onBeforeUnmount(() => {
+	document.removeEventListener('keydown', shortcut)
+})
 </script>
 
 <style lang="less">
@@ -32,13 +42,5 @@ const save = () => {
 	overflow: hidden;
 	display: flex;
 	justify-content: center;
-	> .left{
-		width: 20%;
-		height: 100%;
-	}
-	> .right{
-		width: 20%;
-		height: 100%;
-	}
 }
 </style>

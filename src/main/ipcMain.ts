@@ -1,4 +1,4 @@
-import { BrowserWindow, ipcMain, dialog } from "electron"
+import { BrowserWindow, ipcMain, dialog, OpenDialogOptions } from "electron"
 import { writeFile, readFileSync } from 'fs'
 import { join } from 'path'
 
@@ -49,19 +49,29 @@ export default () => {
 		win?.minimize()
 	})
 	
-	// // 监听保存文件事件  
-	ipcMain.on('read-file-path-main', (event, defaultPath) => {
+	// // 选择文件  
+	ipcMain.on('read-file-path-main', (event, defaultPath: string, type: 'dir' | 'file') => {
 		const win = BrowserWindow.getFocusedWindow()
-		dialog.showSaveDialog( win!, {
+		const element: OpenDialogOptions = {
 			title: '选择路径',
 			defaultPath
-		}).then(result => {
-			event.reply('get-file-path',result.filePath)
+		}
+		if (type === 'dir') element.properties = ['openDirectory']
+		if (type === 'file') element.filters = [ { name: 'Text Files', extensions: ['xstxt'] }]
+		dialog.showOpenDialog( win!, element).then(result => {
+			if (type === 'dir') return event.reply('get-file-path',result.filePaths[0], type)
+			const err = result.filePaths[0]?.split('.')
+			if(!result.filePaths[0]) return
+			if (err![err?.length as number] !== 'xstxt') dialog.showErrorBox('提示','格式错误')
+			else event.reply('read-file-path',result.filePaths[0], type)
 		})
 	});  
 
-	ipcMain.on('save-file-main', (event, filePath: string, data: string) => {
-		writeFile(filePath, btoa(data),(err) => {
+	ipcMain.on('save-file-main', (event, filePath: string | string[], data: string) => {
+		filePath = (<string>filePath).split('.')
+		if (filePath![filePath?.length as number] !== 'xstxt')
+		filePath = (<string[]>filePath).join('.')
+		writeFile(<string>filePath, btoa(data),(err) => {
 			if (err) event.reply('save-file',false)
 			else event.reply('save-file',true)
 		})
