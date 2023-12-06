@@ -9,6 +9,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     Content: typeof import('./src/components/Content.vue')['default']
     Content_cancel: typeof import('./src/components/Content_cancel.vue')['default']
+    ContentCtrl: typeof import('./src/components/module/ContentCtrl.vue')['default']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCard: typeof import('element-plus/es')['ElCard']
     ElDialog: typeof import('element-plus/es')['ElDialog']
@@ -17,6 +18,8 @@ declare module 'vue' {
     ElInput: typeof import('element-plus/es')['ElInput']
     Header: typeof import('./src/components/Header.vue')['default']
     LeftNav: typeof import('./src/components/LeftNav.vue')['default']
+    LeftNavCtrl: typeof import('./src/components/module/LeftNavCtrl.vue')['default']
     Right: typeof import('./src/components/Right.vue')['default']
+    TitleChange: typeof import('./src/components/module/TitleChange.vue')['default']
   }
 }

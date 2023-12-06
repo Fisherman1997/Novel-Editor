@@ -1,6 +1,6 @@
 <template>
     <div class="content" >
-        <div class="text" contenteditable="true" @input="changeText"></div>
+        <div class="text" :contenteditable="mainState.isfile" @input="changeText"></div>
         <div class="footer">
             <div class="ctrl">
                 <span>size：{{ styles.fontSize }}</span>
@@ -16,11 +16,11 @@
 </template>
 <script setup lang="ts">
 import { ref, reactive, computed } from 'vue';
-// import { nextCxecute } from '../utils/common'
+import { mainStore } from '../store/store.main';
 const styles = reactive({
 	fontSize: 16
 })
-
+const mainState = mainStore()
 /**
  * 文本存储数组
  */

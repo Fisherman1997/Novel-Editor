@@ -2,12 +2,8 @@ import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 // Custom APIs for renderer
 
-type apiType = {
-  newWin: (url: string) => void,
-  changeWindow: (type: string) => void
-}
 
-const api: apiType = {
+const api = {
   newWin: (url) => {
     ipcRenderer.send('new-window', url)
   },

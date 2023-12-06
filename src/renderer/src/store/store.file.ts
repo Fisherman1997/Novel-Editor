@@ -1,62 +1,12 @@
 import { defineStore } from 'pinia'
-import { CurrentInfo, characterType, worldViewtype } from './types'
-
-interface mainStoreType {
-    isfile: boolean,
-    isChangeFile: boolean,
-    historicalFiles: string[],
-    editorTextSize: string,
-    background: string,
-    defaultPath: string
-}
-type changeStyleAge = { background: string , editorTextSize: number }
-export const mainStore = defineStore('main', {
-    state: () =>  {
-        let edf: mainStoreType = {
-            isfile: false,
-            isChangeFile: false,
-            background: '#fcf6e9',
-            editorTextSize: '16px',
-            historicalFiles: [],
-            defaultPath: `C:\\Users\\Administrator\\Desktop`
-        }
-        if (localStorage.getItem('main')) edf = JSON.parse(<string>localStorage.getItem('main'))
-        return <mainStoreType>{
-            ...edf
-        }
-    },
-    actions: {
-        /**
-         * @param type isfile是否有文件，文件是被修改
-         * @param value 布尔值
-         */
-        changeFile(type: 'isfile'| 'isChangeFile' ,value){ this[type] = value },
-        /**
-         * @param type background编辑器背景色，editorTextSize文字大小
-         * @param value 
-         */
-        changeStyle<T extends keyof changeStyleAge>(type: T ,value: changeStyleAge[T]){ 
-            if (type === 'editorTextSize') this[type] = value + 'px'
-            else this[type] = <string>value
-        },
-        /**
-         * 历史记录添加
-         */
-        historicalFilesAdd(value: string)  {
-            this.historicalFiles.unshift(value)
-            if (this.historicalFiles.length > 30) this.historicalFiles.pop()
-        },
-        changedefaultPath(value: string) {
-            this.defaultPath = value
-        }
-    }
-})
+import { CurrentInfo, characterType, worldViewtype } from '../utils/types'
+import { mainStore } from './store.main'
 
 
-
+export type nameType = 'book' | 'volumeName' | 'worldName' | 'characterName' | 'chapterName'
 export const fileStore = defineStore('fileInfo', {
     state: () =>  {
-        return <CurrentInfo>{}
+        return { ...new CurrentInfo('') }
     },
     actions: {
         /**
@@ -64,9 +14,7 @@ export const fileStore = defineStore('fileInfo', {
          * @param type book书标题，volumeName册标题，chapterName章节标题，worldName世界观标题，characterName人物标题
          * @param data value数据，index要修改的项的下标，type为book传 0
          */
-        changeName(
-        type: 'book' | 'volumeName' | 'worldName' | 'characterName' | 'chapterName',
-        data: { value: string, index: number[] | number}) {
+        changeName( type: nameType, data: { value: string, index: number[] | number}) {
             mainStore().changeFile('isChangeFile', true)
             const { value, index } = data
             if (type === 'book') {
@@ -116,6 +64,20 @@ export const fileStore = defineStore('fileInfo', {
                 character: this.character
             }
             return JSON.stringify(result)
+        },
+        addVolume() {
+            mainStore().changeFile('isChangeFile', true)
+            this.volume.push({
+                volumeName: '未命名',
+                chapterList: []
+            })
+        },
+        addChapter(volumeIndex) {
+            mainStore().changeFile('isChangeFile', true)
+            this.volume[volumeIndex].chapterList.push({
+                chapterName: '未命名',
+                list: []
+            })
         }
     }
 })

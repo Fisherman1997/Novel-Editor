@@ -2,6 +2,7 @@ import { BrowserWindow, ipcMain, dialog, OpenDialogOptions } from "electron"
 import { writeFile, readFileSync } from 'fs'
 import { join } from 'path'
 
+
 export default () => {
 	ipcMain.on('new-window', (event, url) => {
 		event = event || event
@@ -59,19 +60,20 @@ export default () => {
 		if (type === 'dir') element.properties = ['openDirectory']
 		if (type === 'file') element.filters = [ { name: 'Text Files', extensions: ['xstxt'] }]
 		dialog.showOpenDialog( win!, element).then(result => {
+			// console.log(result.filePaths[0])
 			if (type === 'dir') return event.reply('get-file-path',result.filePaths[0], type)
 			const err = result.filePaths[0]?.split('.')
 			if(!result.filePaths[0]) return
-			if (err![err?.length as number] !== 'xstxt') dialog.showErrorBox('提示','格式错误')
+			if (err![err?.length - 1 as number] !== 'xstxt') dialog.showErrorBox('提示','格式错误')
 			else event.reply('read-file-path',result.filePaths[0], type)
 		})
 	});  
 
 	ipcMain.on('save-file-main', (event, filePath: string | string[], data: string) => {
 		filePath = (<string>filePath).split('.')
-		if (filePath![filePath?.length as number] !== 'xstxt')
+		if (filePath![filePath?.length - 1] !== 'xstxt') return
 		filePath = (<string[]>filePath).join('.')
-		writeFile(<string>filePath, btoa(data),(err) => {
+		writeFile(<string>filePath, data , 'utf-8' ,(err) => {
 			if (err) event.reply('save-file',false)
 			else event.reply('save-file',true)
 		})
@@ -79,8 +81,8 @@ export default () => {
 
 	ipcMain.on('read-file-main', (event, filePath: string) => {
 		try{
-			const result =  readFileSync(filePath)
-			event.reply('read-file', atob(result as any))
+			const result = readFileSync(filePath, 'utf-8')
+			event.reply('read-file',result)
 		} catch{
 			dialog.showErrorBox('提示','新增失败请重新选择路径')
 		}
