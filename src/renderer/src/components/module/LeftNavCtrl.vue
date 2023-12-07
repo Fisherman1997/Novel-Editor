@@ -10,13 +10,18 @@
             cursor: mainState.isfile ? 'pointer' : 'no-drop'
         }">保存</button>
     </div>
-    <el-dialog v-model="openValue" title="新建" width="500" draggable>
+    <el-dialog 
+        v-model="openValue" 
+        title="新建" 
+        width="500" 
+        draggable 
+        :modal="false">
         <el-form label-width="60px">
             <el-form-item label="书名：">
-                <el-input v-model="fileName"/>
+                <el-input size="small" v-model="fileName"/>
             </el-form-item>
             <el-form-item label="路径：">
-                <el-input v-model="path">
+                <el-input size="small" v-model="path">
                     <template #append>
                         <span :style="{ cursor: 'pointer',userSelect: 'none' }" @click="changePath">路径</span>
                     </template>
@@ -25,8 +30,8 @@
         </el-form>
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="openValue = false">取消</el-button>
-                <el-button type="primary" @click="saveEnter">确定 </el-button>
+                <el-button size="small" @click="openValue = false">取消</el-button>
+                <el-button size="small" type="primary" @click="saveEnter">确定 </el-button>
             </span>
         </template>
     </el-dialog>
@@ -81,7 +86,6 @@ const openInsert = () =>{
         if (resolve) {
             window.electron.ipcRenderer.send('read-file-main', result)
             mainState.historicalFilesAdd(result)
-            console.log(mainState.historicalFiles)
             mainState.changedefaultPath(path.value)
             mainState.changeFile('isfile', true)
             openValue.value = false
@@ -123,6 +127,7 @@ window.electron.ipcRenderer.on('read-file',(ev, data: any) => {
     const result = JSON.parse(data) as CurrentInfo
     fileState.openNewBook(result)
     mainState.changeFile('isfile', true)
+    mainState.setLocalStorage()
 })
 
 // 监听读取文件路径

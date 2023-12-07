@@ -4,6 +4,7 @@ import { mainStore } from './store.main'
 
 
 export type nameType = 'book' | 'volumeName' | 'worldName' | 'characterName' | 'chapterName'
+export type daleteType = 'volume' | 'world' | 'character' | 'chapter'
 export const fileStore = defineStore('fileInfo', {
     state: () =>  {
         return { ...new CurrentInfo('') }
@@ -68,16 +69,33 @@ export const fileStore = defineStore('fileInfo', {
         addVolume() {
             mainStore().changeFile('isChangeFile', true)
             this.volume.push({
-                volumeName: '未命名',
+                volumeName: `第${this.volume.length + 1}册 未命名`,
                 chapterList: []
             })
         },
         addChapter(volumeIndex) {
             mainStore().changeFile('isChangeFile', true)
             this.volume[volumeIndex].chapterList.push({
-                chapterName: '未命名',
+                chapterName: `第${this.volume[volumeIndex].chapterList.length + 1}章 未命名`,
                 list: []
             })
+        },
+        /**
+         * 
+         * @param type 
+         * @param index 
+         */
+        dalete(type: daleteType, index: [number, number?]){
+            mainStore().changeFile('isChangeFile', true)
+            if(type === 'volume') {
+                this.volume.splice(index[0],1)
+            }else if(type === 'world') {
+                this.worldView.splice(index[0],1)
+            }else if(type === 'character') {
+                this.character.splice(index[0],1)
+            }else if(type === 'chapter' && typeof index[1] === 'number'){
+                this.volume[index[0]].chapterList.splice(index[1], 1)
+            }
         }
     }
 })

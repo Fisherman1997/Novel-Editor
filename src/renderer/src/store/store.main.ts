@@ -7,7 +7,10 @@ interface mainStoreType {
     editorTextSize: string,
     background: string,
     defaultPath: string,
-    selectItme: [number, number]
+    selectItme: [number, number],
+    contentFamily: '自定义黑体' | '自定义宋体'
+    fontColor: string,
+    fontLineHeighr: number
 }
 type changeStyleAge = { background: string , editorTextSize: number }
 export const mainStore = defineStore('main', {
@@ -16,12 +19,17 @@ export const mainStore = defineStore('main', {
             isfile: false,
             isChangeFile: false,
             background: '#fcf6e9',
-            editorTextSize: '16px',
+            editorTextSize: '18px',
             historicalFiles: [],
             defaultPath: `C:\\Users\\Administrator\\Desktop`,
-            selectItme: [0,0]
+            selectItme: [0,0],
+            contentFamily: '自定义黑体',
+            fontColor: '#091046',
+            fontLineHeighr: 28
         }
         if (localStorage.getItem('main')) edf = JSON.parse(<string>localStorage.getItem('main'))
+        edf.isfile = false
+        if (edf.historicalFiles.length) window.electron.ipcRenderer.send('read-file-main', edf.historicalFiles[0])
         return <mainStoreType>{
             ...edf
         }
@@ -66,7 +74,11 @@ export const mainStore = defineStore('main', {
                 background,
                 editorTextSize,
                 historicalFiles,
-                defaultPath
+                defaultPath,
+                selectItme,
+                contentFamily,
+                fontColor,
+                fontLineHeighr
             } = this
             localStorage.setItem('main', JSON.stringify({
                 isfile,
@@ -74,7 +86,11 @@ export const mainStore = defineStore('main', {
                 background,
                 editorTextSize,
                 historicalFiles,
-                defaultPath
+                defaultPath,
+                selectItme,
+                contentFamily,
+                fontColor,
+                fontLineHeighr
             }))
         },
         selectChange(volumeIndex: number, characterIndex = 0){

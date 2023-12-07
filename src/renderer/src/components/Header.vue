@@ -8,23 +8,57 @@
         <span class="file-nmae" v-else>[空]</span>
         <div class="right">
             <button :style="{ 'transform': 'scaleX(0.5)' }" @click="changeWin('minimize')">一</button>
-            <button :style="{'margin-left': '10px'}" @click="changeWin('close')">×</button>
+            <button :style="{'margin-left': '10px'}" @click="handleClose">×</button>
         </div>
     </div>
 </template>
 <script setup lang="ts">
-// import { computed } from 'vue';
-// import { mainStore } from '../store/store.main';
+import { onMounted } from 'vue';
+// import { is } from '@electron-toolkit/utils';
+import { ElMessageBox } from 'element-plus'
 import { mainStore } from '@renderer/store/store.main';
 
 const mainState = mainStore()
 
+const handleClose = () => {
+    // if (is.dev) handleCloseFn()
+    // else window.close()
+    window.close()
+}
+
+
+const handleCloseFn = (ev?) => {
+    if (mainState.isChangeFile) {
+        ev.preventDefault()
+        ElMessageBox.confirm(
+            '文件未保存， 强制退出可能丢失部分数据,确认退出？',
+            '警告',
+            {
+                confirmButtonText: '确认',
+                cancelButtonText: '取消',
+                type: 'warning',
+            }
+        )
+        .then(() => {
+            window.removeEventListener('beforeunload', handleCloseFn)
+            changeWin('close')
+        })
+        .catch(() =>{})
+    } else changeWin('close')
+}
+
+onMounted(() => {
+    // if (!is.dev) window.addEventListener('beforeunload', handleCloseFn);
+})
+
+
+
 
 const changeWin = (type: string) => {
     const windowApi: any = window.api
-    console.log(windowApi.changeWindow('isFullScreen'))
     windowApi.changeWindow(type)
 }
+
 </script>
 <style scoped lang="less">
 .head{
