@@ -34,18 +34,42 @@
                 <span>背景颜色</span>
                 <el-color-picker v-model="mainState.background" />
             </div>
+            <div class="itme">
+                <el-button size="small" :type="'warning'" @click="handelClear">清楚缓存</el-button>
+            </div>
+            <div class="itme">
+                <el-slider size="small" v-model="mainState.rightWidth" />
+            </div>
         </div>
     </el-dialog>
 </template>
 
 <script lang="ts" setup>
 import { ref, reactive, watch } from 'vue';
+import { ElMessageBox } from 'element-plus';
 import { mainStore } from '@renderer/store/store.main';
 const mainState = mainStore()
 const openValue = ref(false)
 
 const editorTextSize = ref(parseInt(mainState.editorTextSize))
 const fontStyleList = reactive(['自定义黑体','自定义宋体'])
+
+const handelClear =() => {
+    ElMessageBox.confirm(
+        '确认清楚缓存吗？',
+        '警告',
+        {
+            confirmButtonText: '确认',
+            cancelButtonText: '取消',
+            type: 'warning',
+        }
+    )
+    .then(() => {
+        mainState.deleteLocalStorage()
+        window.electron.ipcRenderer.send('app-relaunch')
+    })
+    .catch(() =>{})
+}
 
 watch(() => editorTextSize.value, newValue => {
     mainState.changeStyle('editorTextSize',newValue)

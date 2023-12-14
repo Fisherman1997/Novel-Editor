@@ -14,7 +14,6 @@
 </template>
 <script setup lang="ts">
 import { onMounted } from 'vue';
-// import { is } from '@electron-toolkit/utils';
 import { ElMessageBox } from 'element-plus'
 import { mainStore } from '@renderer/store/store.main';
 
@@ -48,7 +47,7 @@ const handleCloseFn = (ev?) => {
 }
 
 onMounted(() => {
-    // if (!is.dev) window.addEventListener('beforeunload', handleCloseFn);
+    window.addEventListener('beforeunload', handleCloseFn);
 })
 
 

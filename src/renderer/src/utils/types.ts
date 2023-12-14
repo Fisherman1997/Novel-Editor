@@ -26,11 +26,16 @@ export type worldViewtype = {
 
 /**
  * 人物
+ * name： 名字
+ * personality: 性格
+ * ageOfAppearance； 出现年龄
+ * appearance： 长相 
+ * content： 详细
  */ 
 export type characterType = {
     name: string | null,
     personality: string | null,
-    rventOfAppearance: string | null,
+    appearance: string | null,
     ageOfAppearance: string | null,
     content: string | null
 }

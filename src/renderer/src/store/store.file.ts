@@ -39,6 +39,21 @@ export const fileStore = defineStore('fileInfo', {
             mainStore().changeFile('isChangeFile', true)
             this.volume[index[0]].chapterList[index[1]].list = value
         },
+        addCharacterAndWorld(type: 'character' | 'world') {
+            mainStore().changeFile('isChangeFile', true)
+            if (type === 'character') this.character.push({
+                name: '未命名',
+                personality: '',
+                appearance: '',
+                ageOfAppearance:'',
+                content:''
+            })
+            else this.worldView.push({
+                name: '未命名',
+                setting: [],
+                content:''
+            })
+        },
         characterChange(index: number, data: characterType){
             mainStore().changeFile('isChangeFile', true)
             this.character[index] = data

@@ -1,9 +1,12 @@
-import { BrowserWindow, ipcMain, dialog, OpenDialogOptions } from "electron"
+import { app, BrowserWindow, ipcMain, dialog, OpenDialogOptions } from "electron"
 import { writeFile, readFileSync } from 'fs'
 import { join } from 'path'
 
 
 export default () => {
+	ipcMain.on('app-relaunch', () => {
+		app.relaunch()
+	})
 	ipcMain.on('new-window', (event, url) => {
 		event = event || event
 		const win = new BrowserWindow({

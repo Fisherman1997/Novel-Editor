@@ -120,7 +120,7 @@ defineExpose({openInsert  , save})
 </script>
 <style scoped lang="less">
 .left{
-    width: 20%;
+    width: 250px;
     height: 100%;
     display: flex;
     flex-direction: column;

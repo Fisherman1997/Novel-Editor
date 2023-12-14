@@ -39,7 +39,7 @@
 
 <script lang="ts" setup>
 import { ref, watch } from 'vue';
-import { ElMessage } from 'element-plus'
+import { ElNotification } from 'element-plus'
 import { fileStore } from '../../store/store.file'; 
 import { mainStore } from '../../store/store.main';
 const fileState = fileStore()
@@ -69,14 +69,21 @@ const openInsert = () =>{
  */
  const saveEnter = () => {
     if (!fileName.value) {
-        ElMessage({
+        ElNotification({
             type: 'warning',
-            message: '请输入书名'
+            title: '警告',
+            message: '请输入书名',
+            offset: 40,
         })
         return 
     }
     if (!path.value) {
-        ElMessage.warning('请选择正确的文件路径')
+        ElNotification({
+            type: 'warning',
+            title: '警告',
+            message: '请选择正确的文件路径',
+            offset: 40,
+        })
         return 
     }
     const result = `${path.value}\\${fileName.value}.xstxt`
@@ -92,7 +99,11 @@ const openInsert = () =>{
             fileName.value = ''
         }
         else {
-            ElMessage.error('新增失败')
+            ElNotification.error({
+                title: '提示',
+                message: '新增失败',
+                offset: 40,
+            })
         }   
     })
 }

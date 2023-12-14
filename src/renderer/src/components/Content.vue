@@ -14,7 +14,10 @@
             <div class="ctrl">
                 <ContentSet />
             </div>
-            <span>{{ total }}</span>
+            <ElSpace :size="'large'">
+                <span>{{ totalAll }}</span>
+                <span>{{ total }}</span>
+            </ElSpace>
         </div>
     </div>
 </template>
@@ -23,6 +26,7 @@ import { ref, computed, watch, unref } from 'vue';
 import { mainStore } from '../store/store.main';
 import { fileStore } from '../store/store.file';
 import { nextCxecute } from '@renderer/utils/common';
+import { ElSpace } from 'element-plus';
 import ContentSet from './module/ContentSet.vue'
 
 const mainState = mainStore()
@@ -39,7 +43,7 @@ const editable = computed(() => {
 
 const changeHtml = (newValue: [number,number]) => {
     if (unref(editable)) {
-        text.value.innerHTML = fileState.volume[newValue[0]].chapterList[newValue[1]].list?.join('</div>\n<div>')
+        text.value.innerHTML = `<div>${fileState.volume[newValue[0]].chapterList[newValue[1]].list?.join('</div>\n<div>')}</div>`
     }
 }
 
@@ -68,6 +72,18 @@ const total = computed(() => {
 	return `本章${result}字`
 })
 
+const totalAll = computed(() => {
+	let result = 0
+    if (unref(editable)) {
+        fileState.volume.forEach(itme => {
+            itme.chapterList.forEach(element => {
+                element.list?.forEach(itme => result += itme.length)
+            })
+        })
+    }
+	return `全书${result}字`
+})
+
 
 
 watch(() => mainState.selectItme, changeHtml)
@@ -84,10 +100,12 @@ watch(() => mainState.isfile, async (value) => {
 .content{
     box-shadow: 0 0 1px rgba(0, 0, 0, 0.5);
     position: relative;
-    width: 60%;
+    flex: 1;
+    min-width: 400px;
     overflow: hidden;
     padding: 10px 10px 40px 10px;
     .route{
+        padding-bottom: 5px;
         font-size: 12px;
         color: #000;
     }
@@ -112,7 +130,7 @@ watch(() => mainState.isfile, async (value) => {
         left: 0;
         bottom: 0;
         width: calc(100% - 20px);
-        font-size: 16px;
+        font-size: 14px;
         background-color: #fff;
         box-shadow: 0 0 1px rgba(0, 0, 0, 0.5);
     }

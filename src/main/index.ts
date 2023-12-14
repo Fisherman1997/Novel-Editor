@@ -7,16 +7,17 @@ import ipcMainAll from './ipcMain'
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 670,
+    width: 1380,
+    height: 800,
     show: false,
     autoHideMenuBar: true,
     frame: false,
     icon: join(__dirname,'../../resources/icon.png'),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
-      sandbox: false
-    }
+      sandbox: false,
+      // http
+    }  
   })
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
@@ -31,7 +32,14 @@ function createWindow(): void {
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
-
+  mainWindow.webContents.session.webRequest.onBeforeSendHeaders((ds, callback) => {
+    const { requestHeaders } = ds
+    requestHeaders['Content-Security-Policy'] = 'default-src *'
+    callback({requestHeaders})
+  })
+  
+  // ServiceWorkers.webRequest.onBeforeRequest()
+  // webContents.session
 }
 app.whenReady().then(() => {
   electronApp.setAppUserModelId('com.electron')

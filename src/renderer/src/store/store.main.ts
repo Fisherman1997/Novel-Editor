@@ -10,7 +10,8 @@ interface mainStoreType {
     selectItme: [number, number],
     contentFamily: '自定义黑体' | '自定义宋体'
     fontColor: string,
-    fontLineHeighr: number
+    fontLineHeighr: number,
+    rightWidth: number
 }
 type changeStyleAge = { background: string , editorTextSize: number }
 export const mainStore = defineStore('main', {
@@ -25,14 +26,13 @@ export const mainStore = defineStore('main', {
             selectItme: [0,0],
             contentFamily: '自定义黑体',
             fontColor: '#091046',
-            fontLineHeighr: 28
+            fontLineHeighr: 28,
+            rightWidth: 40
         }
         if (localStorage.getItem('main')) edf = JSON.parse(<string>localStorage.getItem('main'))
         edf.isfile = false
         if (edf.historicalFiles.length) window.electron.ipcRenderer.send('read-file-main', edf.historicalFiles[0])
-        return <mainStoreType>{
-            ...edf
-        }
+        return <mainStoreType>{ ...edf }
     },
     getters: {
         getFileName: (state) => {
@@ -78,7 +78,8 @@ export const mainStore = defineStore('main', {
                 selectItme,
                 contentFamily,
                 fontColor,
-                fontLineHeighr
+                fontLineHeighr,
+                rightWidth
             } = this
             localStorage.setItem('main', JSON.stringify({
                 isfile,
@@ -90,8 +91,12 @@ export const mainStore = defineStore('main', {
                 selectItme,
                 contentFamily,
                 fontColor,
-                fontLineHeighr
+                fontLineHeighr,
+                rightWidth
             }))
+        },
+        deleteLocalStorage() {
+            localStorage.removeItem('main')
         },
         selectChange(volumeIndex: number, characterIndex = 0){
             this.selectItme = [ volumeIndex, characterIndex ]
