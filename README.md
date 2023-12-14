@@ -1,28 +1,28 @@
-# Novel-Editor
+# Novel-Editor 小说编辑器
 
-小说编辑器demoo
+electron+typescript-vue     项目新建于： @quick-start/electron
 
-An Electron application with Vue and TypeScript
+| 渲染进程下的技术栈 | electron     |
+| ------------------ | ------------ |
+| 基础框架           | vue          |
+| 状态管理           | pinia        |
+| 组件库             | element-puls |
 
-## Recommended IDE Setup
 
-- [VSCode](https://code.visualstudio.com/) + [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) + [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin)
 
-## Project Setup
-
-### Install
+### 安装依赖
 
 ```bash
-$ npm i
+$ npm i        // 用yarn的话会出现依赖安装失败的情况
 ```
 
-### Development
+### 开发环境启动
 
 ```bash
 $ npm dev
 ```
 
-### Build
+### 打包
 
 ```bash
 # For windows
