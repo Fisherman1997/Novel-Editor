@@ -25,6 +25,7 @@ declare module 'vue' {
     ElSlider: typeof import('element-plus/es')['ElSlider']
     ElTabPane: typeof import('element-plus/es')['ElTabPane']
     ElTabs: typeof import('element-plus/es')['ElTabs']
+    ExportModul: typeof import('./src/components/module/ExportModul.vue')['default']
     Header: typeof import('./src/components/Header.vue')['default']
     LeftNav: typeof import('./src/components/LeftNav.vue')['default']
     LeftNavCtrl: typeof import('./src/components/module/LeftNavCtrl.vue')['default']

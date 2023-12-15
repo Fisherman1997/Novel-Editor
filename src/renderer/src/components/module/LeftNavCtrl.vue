@@ -144,7 +144,10 @@ window.electron.ipcRenderer.on('read-file',(ev, data: any) => {
 // 监听读取文件路径
 window.electron.ipcRenderer.on('read-file-path',(ev, value: string, type: 'dir' | 'file') => {
     ev || ev
-    if (type === 'dir' ) mainState.changedefaultPath(value)
+    if (type === 'dir' ) {
+        console.log(value)
+        mainState.changedefaultPath(value)
+    }
     else {
         mainState.historicalFilesAdd(value)
         let list = value.split('\\')

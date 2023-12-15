@@ -12,7 +12,10 @@
             @input="changeText"></div>
         <div class="footer">
             <div class="ctrl">
-                <ContentSet />
+                <ElSpace :size="'large'">
+                    <ContentSet />
+                    <ExportModul />
+                </ElSpace>
             </div>
             <ElSpace :size="'large'">
                 <span>{{ totalAll }}</span>
@@ -28,6 +31,7 @@ import { fileStore } from '../store/store.file';
 import { nextCxecute } from '@renderer/utils/common';
 import { ElSpace } from 'element-plus';
 import ContentSet from './module/ContentSet.vue'
+import ExportModul from './module/ExportModul.vue';
 
 const mainState = mainStore()
 const fileState = fileStore()
