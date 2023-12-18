@@ -63,19 +63,19 @@ const getFlieElement = () => {
     }
     result.volume = result.volume.map(itme => {
         itme.chapterList = itme.chapterList.map(citme => {
-            citme.list = <any>citme.list?.join('\n')
+            citme.list = `　　${citme.list?.join('\n\n　　')}` as any
             return citme
         })
         return itme
     })
-return result
+    return result
 }
 
 window.electron.ipcRenderer.on('export-result', (ev, value) => {
     ev || ev
     if (value) ElNotification({
         title: '提示',
-        offset: 100,
+        offset: 40,
         message: '导出成功',
         type: 'success'
     })
