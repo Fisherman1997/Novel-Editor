@@ -1,17 +1,14 @@
 <template>
-    <el-button @click="openValue = true" size="small">导出</el-button>
-    <el-dialog 
-        v-model="openValue" 
-        title="导出" 
-        width="500" 
-        draggable 
-        :modal="false">
+    <el-button size="small" @click="openValue = true">导出</el-button>
+    <el-dialog v-model="openValue" title="导出" width="500" draggable :modal="false">
         <div class="export">
             <div class="itme">
                 <span>路径</span>
-                <el-input size="small" v-model="mainState.defaultPath">
+                <el-input v-model="mainState.defaultPath" size="small">
                     <template #append>
-                        <span :style="{ cursor: 'pointer',userSelect: 'none' }" @click="changePath">路径</span>
+                        <span :style="{ cursor: 'pointer', userSelect: 'none' }" @click="changePath"
+                            >路径</span
+                        >
                     </template>
                 </el-input>
             </div>
@@ -25,10 +22,10 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
-import { mainStore } from '@renderer/store/store.main';
-import { fileStore } from '@renderer/store/store.file';
-import { CurrentInfo } from '@renderer/utils/types';
+import { ref } from 'vue'
+import { mainStore } from '@renderer/store/store.main'
+import { fileStore } from '@renderer/store/store.file'
+import { CurrentInfo } from '../../../../types/types'
 import { deepClone } from '@renderer/utils/common'
 
 import { ElNotification } from 'element-plus'
@@ -38,14 +35,16 @@ const fileState = fileStore()
 const openValue = ref(false)
 
 const changePath = () => {
-    window.electron.ipcRenderer.send('read-file-path-main', mainState.defaultPath ,'dir')
+    window.electron.ipcRenderer.send('read-file-path-main', mainState.defaultPath, 'dir')
 }
-
 
 const handleExportAll = () => {
     if (fileState.volume.length && fileState.volume[0].chapterList.length) {
-
-        window.electron.ipcRenderer.send('export', { type: 'all', data: getFlieElement(), path: mainState.defaultPath})
+        window.electron.ipcRenderer.send('export', {
+            type: 'all',
+            data: getFlieElement(),
+            path: mainState.defaultPath
+        })
     } else {
         ElNotification.warning({
             title: '提示',
@@ -61,9 +60,10 @@ const getFlieElement = () => {
         worldView: deepClone(fileState.worldView),
         character: deepClone(fileState.character)
     }
-    result.volume = result.volume.map(itme => {
-        itme.chapterList = itme.chapterList.map(citme => {
-            citme.list = `　　${citme.list?.join('\n\n　　')}` as any
+    result.volume = result.volume.map((itme) => {
+        itme.chapterList = itme.chapterList.map((citme) => {
+            // eslint-disable-next-line no-irregular-whitespace
+            citme.list = `　　${(citme.list as string[]).join('\n\n　　')}`
             return citme
         })
         return itme
@@ -73,29 +73,30 @@ const getFlieElement = () => {
 
 window.electron.ipcRenderer.on('export-result', (ev, value) => {
     ev || ev
-    if (value) ElNotification({
-        title: '提示',
-        offset: 40,
-        message: '导出成功',
-        type: 'success'
-    })
-    else ElNotification({
-        title: '警告',
-        offset: 40,
-        message: '导出失败',
-        type: 'error'
-    })
+    if (value)
+        ElNotification({
+            title: '提示',
+            offset: 40,
+            message: '导出成功',
+            type: 'success'
+        })
+    else
+        ElNotification({
+            title: '警告',
+            offset: 40,
+            message: '导出失败',
+            type: 'error'
+        })
 })
-
 </script>
 
 <style scoped lang="less">
-.export{
+.export {
     .itme {
         display: flex;
         align-items: center;
         margin-bottom: 10px;
-        > span::after{
+        > span::after {
             content: '：';
         }
         .el-input {

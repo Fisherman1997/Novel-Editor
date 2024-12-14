@@ -1,9 +1,10 @@
+export type controlWindowType = 'close' | 'show' | 'hide' | 'maximize' | 'minimize' | 'restore'
 
 /**
  * 章节
  */
 export type chaptertype = {
-    chapterName: string | null,
+    chapterName: string | null
     list: string[] | null
 }
 
@@ -11,7 +12,7 @@ export type chaptertype = {
  * 册
  */
 export type volumetype = {
-    volumeName: string | null,
+    volumeName: string | null
     chapterList: chaptertype[]
 }
 
@@ -29,17 +30,16 @@ export type worldViewtype = {
  * name： 名字
  * personality: 性格
  * ageOfAppearance； 出现年龄
- * appearance： 长相 
+ * appearance： 长相
  * content： 详细
- */ 
+ */
 export type characterType = {
-    name: string | null,
-    personality: string | null,
-    appearance: string | null,
-    ageOfAppearance: string | null,
+    name: string | null
+    personality: string | null
+    appearance: string | null
+    ageOfAppearance: string | null
     content: string | null
 }
-
 
 // type currentInfotype = {
 //     name: string,
@@ -56,7 +56,12 @@ export class CurrentInfo {
     volume: volumetype[]
     worldView: worldViewtype[]
     character: characterType[]
-    constructor(name: string, volume?: volumetype[], worldView?: worldViewtype[], character?: characterType[]) {
+    constructor(
+        name: string,
+        volume?: volumetype[],
+        worldView?: worldViewtype[],
+        character?: characterType[]
+    ) {
         this.name = name
         this.volume = volume || []
         this.worldView = worldView || []

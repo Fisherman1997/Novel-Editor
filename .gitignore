@@ -3,3 +3,8 @@ dist
 out
 *.log*
 ttf
+.idea
+.vs
+*.tsbuildinfo
+*.mjs\
+.vscode
