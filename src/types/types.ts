@@ -1,65 +1,55 @@
 export type controlWindowType = 'close' | 'show' | 'hide' | 'maximize' | 'minimize' | 'restore'
 
+// export interface EditableDivInputEvent extends Event {
+//     target: HTMLDivElement;
+// }
+
+
 /**
  * 章节
  */
-export type chaptertype = {
-    chapterName: string | null
-    list: string[] | null
+export type chapterType = {
+    chapterName: string
+    list: string[] | string
 }
 
 /**
  * 册
  */
-export type volumetype = {
-    volumeName: string | null
-    chapterList: chaptertype[]
+export interface volumeType {
+    volumeName: string
+    chapterList: chapterType[]
 }
 
 /**
  * 世界观、设定
  */
-export type worldViewtype = {
-    name: string | null
-    setting: string[] | null
-    content: string | null
+export interface worldViewType {
+    name: string
+    setting: string[]
+    content: string
 }
 
-/**
- * 人物
- * name： 名字
- * personality: 性格
- * ageOfAppearance； 出现年龄
- * appearance： 长相
- * content： 详细
- */
-export type characterType = {
-    name: string | null
-    personality: string | null
-    appearance: string | null
-    ageOfAppearance: string | null
-    content: string | null
+export interface characterType {
+    name: string;
+    personality: string;
+    appearance: string;
+    ageOfAppearance: string;
+    content: string;
 }
-
-// type currentInfotype = {
-//     name: string,
-//     volume: volumetype[],
-//     worldView: worldViewtype[],
-//     character: characterType[]
-// }
 
 /**
  * 本书
  */
 export class CurrentInfo {
     name: string
-    volume: volumetype[]
-    worldView: worldViewtype[]
+    volume: volumeType[]
+    worldView: worldViewType[]
     character: characterType[]
     constructor(
         name: string,
-        volume?: volumetype[],
-        worldView?: worldViewtype[],
+        volume?: volumeType[],
+        worldView?: worldViewType[],
         character?: characterType[]
     ) {
         this.name = name

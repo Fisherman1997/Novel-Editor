@@ -1,12 +1,15 @@
 <template>
-    <div class="content" >
+    <div class="content">
         <div class="text" @click="liFocus">
-            <li 
-                v-for="(text,index) in content"	
-                contenteditable="true" 
+            <li
+                v-for="(text, index) in content"
+                contenteditable="true"
                 :style="{ fontSize: styles.fontSize + 'px' }"
                 @input="(ev) => changeText(ev, index)"
-                @keydown="(ev) => nextText(ev, index)">{{text}}</li>
+                @keydown="(ev) => nextText(ev, index)"
+            >
+                {{ text }}
+            </li>
         </div>
         <div class="footer">
             <div class="ctrl">
@@ -22,10 +25,10 @@
     </div>
 </template>
 <script setup lang="ts">
-import { nextTick, reactive, computed } from 'vue';
+import { nextTick, reactive, computed } from 'vue'
 // import { nextCxecute } from '../utils/common'
 const styles = reactive({
-	fontSize: 16
+    fontSize: 16
 })
 
 /**
@@ -79,50 +82,48 @@ const changeSelect = (ev) => {
     }
     document.addEventListener('mousemove', move)
     document.addEventListener('mouseup', mouseup)
-    
+
 }
 */
 
 /**
  *  光标换行及回车增、删除、光标跟随
- * @param ev 
+ * @param ev
  * @param index 当前元素下标
  */
-const nextText= async (ev, index: number) => {
-	const targetText = ev.target.innerText.split('/n').join('')
-	const list = ev.target.parentNode?.getElementsByTagName('li')
-    const selection = window.getSelection();  
-    const caretPos = selection!.anchorOffset;  
-	if (ev.key === 'Enter') {
-		ev.preventDefault()
-		if (!targetText || !targetText.length) return
+const nextText = async (ev, index: number) => {
+    const targetText = ev.target.innerText.split('/n').join('')
+    const list = ev.target.parentNode?.getElementsByTagName('li')
+    const selection = window.getSelection()
+    const caretPos = selection!.anchorOffset
+    if (ev.key === 'Enter') {
+        ev.preventDefault()
+        if (!targetText || !targetText.length) return
         let createIndex = index + 1
         if (caretPos !== targetText.length && caretPos > 0) {
-            content.splice(createIndex, 0 , content[index].substring(caretPos))
+            content.splice(createIndex, 0, content[index].substring(caretPos))
             content[index] = content[index].substring(0, caretPos)
-        } 
-        else if (caretPos === 0) {
+        } else if (caretPos === 0) {
             createIndex = index
-            content.splice(createIndex, 0 , '')
-        } 
-        else content.splice(createIndex, 0 , '')
-		nextTick(() => {
+            content.splice(createIndex, 0, '')
+        } else content.splice(createIndex, 0, '')
+        nextTick(() => {
             viewBottom(ev.target.parentNode, createIndex)
             switchFocus(list![createIndex], true)
-		})
-	} else if (ev.key === 'Backspace' && caretPos === 0){
-		if (content.length <= 1) return
+        })
+    } else if (ev.key === 'Backspace' && caretPos === 0) {
+        if (content.length <= 1) return
         if (!index && content[index].length) return
-		ev.preventDefault()
+        ev.preventDefault()
         if (content[index].length) content[index - 1] += content[index]
         content.splice(index, 1)
-		nextTick(() => {
+        nextTick(() => {
             if (index === 0) switchFocus(list![index], true)
             else switchFocus(list![index - 1], false)
-		})
-	} else if (ev.key ===  'ArrowUp' && caretPos === 0 && list![index - 1]) {
+        })
+    } else if (ev.key === 'ArrowUp' && caretPos === 0 && list![index - 1]) {
         switchFocus(list![index - 1], false)
-    } else if(ev.key === 'ArrowDown' && caretPos === targetText.length && list![index + 1]) {
+    } else if (ev.key === 'ArrowDown' && caretPos === targetText.length && list![index + 1]) {
         switchFocus(list![index + 1], true)
     }
 }
@@ -133,19 +134,18 @@ const nextText= async (ev, index: number) => {
  * @param index 元素下标
  */
 const viewBottom = (element, index: number) => {
-    if (content.length - 4 < index)
-    element.scrollTop = element.scrollHeight 
+    if (content.length - 4 < index) element.scrollTop = element.scrollHeight
 }
 const changeText = (ev, index: number) => {
-	// ev.preventDefault();
-	content[index] = ev.target.innerText.split('/n').join('')
+    // ev.preventDefault();
+    content[index] = ev.target.innerText.split('/n').join('')
     viewBottom(ev.target.parentNode, index)
 }
 
 const total = computed(() => {
-	let result = 0
-	content.forEach((itme) => result += itme.length)
-	return result + '字'
+    let result = 0
+    content.forEach((itme) => (result += itme.length))
+    return result + '字'
 })
 
 /**
@@ -160,27 +160,27 @@ const liFocus = async (ev) => {
 }
 
 /**
- * 
+ *
  * @param element 光标所在节点
- * @param type 设置为 false 将光标置于文本末尾，设置为 true 将光标置于文本开头  
+ * @param type 设置为 false 将光标置于文本末尾，设置为 true 将光标置于文本开头
  */
 const switchFocus = (element: HTMLElement, type: boolean) => {
-    const selection = window.getSelection();  
-    const range = document.createRange();  
-    range.selectNodeContents(element);  
-    range.collapse(type);
-    selection!.removeAllRanges();
-    selection!.addRange(range);  
+    const selection = window.getSelection()
+    const range = document.createRange()
+    range.selectNodeContents(element)
+    range.collapse(type)
+    selection!.removeAllRanges()
+    selection!.addRange(range)
 }
 
 const Jump = (url) => {
     // (window.api! as any).newWin(url)
-    window.electron.ipcRenderer.send('new-window',url)
+    window.electron.ipcRenderer.send('new-window', url)
 }
 </script>
 
 <style lang="less" scoped>
-.content{
+.content {
     box-shadow: 0 0 1px rgba(0, 0, 0, 0.5);
     position: relative;
     background-color: #fcf6e9;
@@ -195,22 +195,22 @@ const Jump = (url) => {
         overflow-y: auto;
         display: flex;
         flex-direction: column;
-        li{
+        li {
             display: block;
             width: 100%;
             white-space: normal;
             // word-wrap: break-word;
-            // overflow-wrap: break-word; 
+            // overflow-wrap: break-word;
             text-indent: 2em;
             outline: none;
             border: none;
             margin-top: 10px;
         }
-        li:focus{
+        li:focus {
             background-color: rgb(241, 241, 241);
         }
     }
-    .footer{
+    .footer {
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -222,7 +222,7 @@ const Jump = (url) => {
         font-size: 16px;
         background-color: #fff;
         box-shadow: 0 0 1px rgba(0, 0, 0, 0.5);
-        button{
+        button {
             cursor: pointer;
             border-radius: 5px;
             background-color: rgb(22, 224, 231);
