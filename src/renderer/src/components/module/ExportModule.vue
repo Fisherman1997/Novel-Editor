@@ -35,16 +35,31 @@ const fileState = fileStore()
 const openValue = ref(false)
 
 const changePath = () => {
-    window.electron.ipcRenderer.send('read-file-path-main', mainState.defaultPath, 'dir')
+    window.electron.ipcRenderer.invoke('read-file-path-main', mainState.defaultPath, 'dir')
+        .then((value: string) => {
+            mainState.changeDefaultPath(value)
+        })
 }
 
-const handleExportAll = () => {
+const handleExportAll = async () => {
     if (fileState.volume.length && fileState.volume[0].chapterList.length) {
-        window.electron.ipcRenderer.send('export', {
+        const exportBol = await window.electron.ipcRenderer.invoke('export', {
             type: 'all',
-            data: getFlieElement(),
+            data: getFileElement(),
             path: mainState.defaultPath
+        }) as boolean
+        if (exportBol) ElNotification({
+            title: '提示',
+            offset: 40,
+            message: '导出成功',
+            type: 'success'
         })
+        else ElNotification({
+                title: '警告',
+                offset: 40,
+                message: '导出失败',
+                type: 'error'
+            })
     } else {
         ElNotification.warning({
             title: '提示',
@@ -53,41 +68,24 @@ const handleExportAll = () => {
     }
 }
 
-const getFlieElement = () => {
+const getFileElement = () => {
     const result: CurrentInfo = {
         name: fileState.name,
         volume: deepClone(fileState.volume),
         worldView: deepClone(fileState.worldView),
         character: deepClone(fileState.character)
     }
-    result.volume = result.volume.map((itme) => {
-        itme.chapterList = itme.chapterList.map((citme) => {
+    result.volume = result.volume.map((item) => {
+        item.chapterList = item.chapterList.map((cItem) => {
             // eslint-disable-next-line no-irregular-whitespace
-            citme.list = `　　${(citme.list as string[]).join('\n\n　　')}`
-            return citme
+            cItem.list = `　　${(cItem.list as string[]).join('\n\n　　')}`
+            return cItem
         })
-        return itme
+        return item
     })
     return result
 }
 
-window.electron.ipcRenderer.on('export-result', (ev, value) => {
-    ev || ev
-    if (value)
-        ElNotification({
-            title: '提示',
-            offset: 40,
-            message: '导出成功',
-            type: 'success'
-        })
-    else
-        ElNotification({
-            title: '警告',
-            offset: 40,
-            message: '导出失败',
-            type: 'error'
-        })
-})
 </script>
 
 <style scoped lang="less">

@@ -1,9 +1,22 @@
 import { app, BrowserWindow, ipcMain, dialog, OpenDialogOptions, shell } from "electron";
-import { writeFile, readFileSync, existsSync, mkdirSync } from 'fs'
+import { writeFile, readFileSync, existsSync, mkdirSync, openSync, closeSync } from 'fs'
 import { join } from "path";
 import { CurrentInfo, controlWindowType } from "../types/types";
+import { flock } from "fs-ext";
+
+
 
 export default () => {
+    interface currentFileType {
+        current: number | null,
+        path: string | null,
+    }
+    // 当前文件的id
+    let currentFile: currentFileType = {
+        current: null,
+        path: null,
+    }
+
     // 通用函数：确保文件夹存在
     const createDirIfNotExist = (dirPath: string) => {
         if (!existsSync(dirPath)) mkdirSync(dirPath)
@@ -19,9 +32,37 @@ export default () => {
         })
     }
 
-    ipcMain.handle('desktopPath',() => {
-        return app.getPath('desktop')
+    const lockFile = (fileDescriptor: number) => {
+        flock(fileDescriptor,'ex',err => {
+            if (err) {
+                closeSync(fileDescriptor); // 失败时关闭文件描述符
+                console.error('无法获得文件锁:', err.message);
+            } else {
+                console.log(`${fileDescriptor} 123`);
+            }
+        })
+    }
+
+    const unlockFile = (fileDescriptor: number) => {
+        flock(fileDescriptor,'un',err => {
+            if (err) {
+                console.error('无法释放文件锁:', err.message);
+                return
+            }
+            closeSync(fileDescriptor); // 关闭文件描述符
+            console.log('文件锁已释放');
+        })
+    }
+
+    ipcMain.on("lock-file", (_ev, fileDescriptor: number) => {
+        lockFile(fileDescriptor);
     })
+
+    ipcMain.on("un-lock-file", (_ev, fileDescriptor: number) => {
+        // fsExt.openSync
+        unlockFile(fileDescriptor)
+    })
+
 
     ipcMain.on('open-file', (_event, filePath: string) => {
         // 使用 shell.openPath 打开指定路径的文件
@@ -113,23 +154,36 @@ export default () => {
     })
 
     // 读取文件
-    ipcMain.handle('read-file-main', (_event, filePath: string): string | null => {
+    ipcMain.handle('read-file-main', (_event, filePath: string) => {
         try {
-            return readFileSync(filePath, 'utf-8')
-        } catch {
+            if (currentFile.current !== null) {
+                // chmodSync(currentFile.path as string, 0o666)
+                unlockFile(currentFile.current)
+                currentFile.current = null
+                currentFile.path = null
+            }
+            const result = readFileSync(filePath, 'utf-8')
+            currentFile.current = openSync(filePath,'r+')
+            currentFile.path = filePath
+            lockFile(currentFile.current)
+            // chmodSync(filePath, 0o444)
+            return result
+        } catch(err) {
             dialog.showErrorBox('提示', '读取失败，请重新选择路径')
+            console.error(err)
             return null
         }
     })
 
+    ipcMain.handle('desktopPath',() => {
+        return app.getPath('desktop')
+    })
 
     // 保存文件
     ipcMain.handle('save-file-main', async (_event, filePath: string | string[], data: string): Promise<boolean> => {
         if ((<string>filePath).split('.').pop() !== 'xstxt') return false
         return await writeFileAsync(<string>filePath, data)
     })
-
-
 
     // 导出数据
     interface ExportProps {
@@ -138,7 +192,7 @@ export default () => {
         data: CurrentInfo
     }
 
-    ipcMain.on('export', async (event, { data, type, path }: ExportProps) => {
+    ipcMain.handle('export', async (_event, { data, type, path }: ExportProps) => {
         try {
             const baseDir = join(path, data.name)
 
@@ -191,12 +245,11 @@ export default () => {
 
             // 等待所有文件操作完成
             const results = await Promise.all(exportPromises)
-            const success = results.every((result) => result)
 
-            event.reply('export-result', success)
+            return results.every((result) => result)
         } catch (error) {
             console.error(error)
-            event.reply('export-result', false)
+            return false
         }
     })
 }

@@ -66,12 +66,12 @@ export const mainStore = defineStore('main', {
          * 历史记录添加
          */
         historicalFilesAdd(value: string) {
-            const result = this.historicalFiles.filter((itme) => itme !== value)
+            const result = this.historicalFiles.filter((item) => item !== value)
             result.unshift(value)
             if (this.historicalFiles.length > 30) result.pop()
             this.historicalFiles = result
         },
-        changedefaultPath(value: string) {
+        changeDefaultPath(value: string) {
             this.defaultPath = value
         },
         setLocalStorage() {

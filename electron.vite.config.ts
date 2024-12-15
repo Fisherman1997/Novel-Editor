@@ -5,26 +5,31 @@ import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 export default defineConfig({
-  main: {
-    plugins: [externalizeDepsPlugin()]
-  },
-  preload: {
-    plugins: [externalizeDepsPlugin()]
-  },
-  renderer: {
-    resolve: {
-      alias: {
-        '@renderer': resolve('src/renderer/src')
-      }
+    main: {
+        plugins: [externalizeDepsPlugin()],
+        build: {
+            rollupOptions: {
+                external: ['fs-ext'],
+            }
+        }
     },
-    plugins: [
-      vue(),
-      AutoImport({
-        resolvers: [ElementPlusResolver()],
-      }),
-      Components({
-        resolvers: [ElementPlusResolver()],
-      })
-    ]
-  }
+    preload: {
+        plugins: [externalizeDepsPlugin()]
+    },
+    renderer: {
+        resolve: {
+          alias: {
+            '@renderer': resolve('src/renderer/src')
+          }
+        },
+        plugins: [
+          vue(),
+          AutoImport({
+              resolvers: [ElementPlusResolver()],
+          }),
+          Components({
+              resolvers: [ElementPlusResolver()],
+          })
+        ]
+    }
 })

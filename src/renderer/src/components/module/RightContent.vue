@@ -10,20 +10,20 @@
             <el-scrollbar wrap-class="top-content">
                 <template v-if="tableData.length" :key="currentRow">
                     <li
-                        v-for="(itme, index) in tableData"
+                        v-for="(item, index) in tableData"
                         :key="index"
                         :class="{ select: currentRow === index }"
                         @click="currentRow = index"
                     >
-                        <div class="itme-text">
+                        <div class="item-text">
                             <TitleChange
-                                :name="<string>itme.name"
+                                :name="<string>item.name"
                                 @change-name="
                                     (value) => fileState.changeName(`${type}Name`, { value, index })
                                 "
                             />
                         </div>
-                        <div class="itme-delete">
+                        <div class="item-delete">
                             <el-popconfirm
                                 title="确认删除吗？"
                                 confirm-button-text="确认"
@@ -42,7 +42,7 @@
                 </template>
             </el-scrollbar>
         </div>
-        <div class="right-move" @mousedown="handleMouseDonw"></div>
+        <div class="right-move" @mousedown="handleMouseDown"></div>
         <div ref="bottom" class="right-bottom">
             <div v-if="type === 'world'" class="world">
                 <template v-if="!tableData[currentRow]">
@@ -60,7 +60,7 @@
                     <el-empty description="无内容" />
                 </template>
                 <template v-else>
-                    <div class="itme-bottom">
+                    <div class="item-bottom">
                         <span>名字</span>
                         <el-input
                             v-model="tableData[currentRow].name"
@@ -68,7 +68,7 @@
                             @input="mainState.changeFile('isChangeFile', true)"
                         ></el-input>
                     </div>
-                    <div class="itme-bottom">
+                    <div class="item-bottom">
                         <span>性格</span>
                         <el-input
                             v-model="(tableData[currentRow] as characterType).personality"
@@ -76,7 +76,7 @@
                             @input="mainState.changeFile('isChangeFile', true)"
                         ></el-input>
                     </div>
-                    <div class="itme-bottom">
+                    <div class="item-bottom">
                         <span>出场年龄</span>
                         <el-input
                             v-model="(tableData[currentRow] as characterType).ageOfAppearance"
@@ -84,7 +84,7 @@
                             @input="mainState.changeFile('isChangeFile', true)"
                         ></el-input>
                     </div>
-                    <div class="itme-bottom">
+                    <div class="item-bottom">
                         <span>长相</span>
                         <el-input
                             v-model="(tableData[currentRow] as characterType).appearance"
@@ -92,7 +92,7 @@
                             @input="mainState.changeFile('isChangeFile', true)"
                         ></el-input>
                     </div>
-                    <div class="itme-bottom">
+                    <div class="item-bottom">
                         <span>详情</span>
                         <el-input
                             v-model="tableData[currentRow].content"
@@ -144,13 +144,13 @@ const handleAdd = () => {
  * 上下拖动改变高度处理函数
  * @param ev
  */
-const handleMouseDonw = (ev: MouseEvent) => {
+const handleMouseDown = (ev: MouseEvent) => {
     const strY = ev.clientY
     const topDom = top.value as HTMLElement
     const bottomDom = bottom.value as HTMLElement
     const th = topDom.offsetHeight
     const bh = bottomDom.offsetHeight
-    const move = (event) => {
+    const move = (event: MouseEvent) => {
         const newY = event.clientY - strY
         const t = th + newY
         const b = bh + newY * -1
@@ -208,7 +208,7 @@ onBeforeUnmount(() => {
             }
         }
         .character {
-            .itme-bottom {
+            .item-bottom {
                 padding: 10px;
                 display: flex;
                 align-items: center;
@@ -242,13 +242,13 @@ onBeforeUnmount(() => {
                 align-items: center;
                 height: 30px;
                 box-shadow: 0 0 0.5px rgba(0, 0, 0, 1);
-                .itme-text {
+                .item-text {
                     line-height: 18px;
                     flex: 1;
                     overflow: hidden;
                     text-overflow: ellipsis;
                 }
-                .itme-delete {
+                .item-delete {
                     user-select: none;
                     // transform: scale(2);
                     font-size: 18px;

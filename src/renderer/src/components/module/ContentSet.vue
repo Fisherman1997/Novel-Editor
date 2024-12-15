@@ -1,12 +1,12 @@
 <template>
     <el-button size="small" @click="openValue = true">设置</el-button>
     <el-dialog v-model="openValue" title="设置" width="400" draggable :modal="false">
-        <div class="constent-set">
-            <div class="itme">
+        <div class="content-set">
+            <div class="item">
                 <span>字体大小</span>
                 <el-input-number v-model="editorTextSize" size="small" :min="12" :max="36" />
             </div>
-            <div class="itme">
+            <div class="item">
                 <span>文字行高</span>
                 <el-input-number
                     v-model="mainState.fontLineHeight"
@@ -15,7 +15,7 @@
                     :max="36"
                 />
             </div>
-            <div class="itme">
+            <div class="item">
                 <span>字体样式</span>
                 <el-select v-model="mainState.contentFamily" size="small">
                     <el-option
@@ -26,18 +26,18 @@
                     />
                 </el-select>
             </div>
-            <div class="itme">
+            <div class="item">
                 <span>文字颜色</span>
                 <el-color-picker v-model="mainState.fontColor" />
             </div>
-            <div class="itme">
+            <div class="item">
                 <span>背景颜色</span>
                 <el-color-picker v-model="mainState.background" />
             </div>
-            <div class="itme">
+            <div class="item">
                 <el-button size="small" :type="'warning'" @click="handelClear">清楚缓存</el-button>
             </div>
-            <div class="itme">
+            <div class="item">
                 <el-slider v-model="mainState.rightWidth" size="small" />
             </div>
         </div>
@@ -76,8 +76,8 @@ watch(
 </script>
 
 <style scoped lang="less">
-.constent-set {
-    .itme {
+.content-set {
+    .item {
         margin-bottom: 10px;
         > span::after {
             content: '：';

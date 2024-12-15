@@ -57,6 +57,9 @@ const path = ref(mainState.defaultPath)
 
 
 const handleReadFile = (data: string) => {
+    // if (mainState.historicalFiles.length) {
+    //     mainState.changeFile('isfile', false)
+    // }
     const result = JSON.parse(data) as CurrentInfo
     fileState.openNewBook(result)
     mainState.changeFile('isfile', true)
@@ -67,12 +70,12 @@ const handleReadFile = (data: string) => {
 const handleReadFilePath = async (value: string, type: 'dir' | 'file') => {
     if (type === 'dir') {
         console.log(value)
-        mainState.changedefaultPath(value)
+        mainState.changeDefaultPath(value)
     } else {
         mainState.historicalFilesAdd(value)
         const list = value.split('\\')
         list.pop()
-        mainState.changedefaultPath(list.join('\\'))
+        mainState.changeDefaultPath(list.join('\\'))
         mainState.changeFile('isChangeFile', false)
         mainState.changeFile('isfile', true)
         // console.log(value)
@@ -101,20 +104,23 @@ const openInsert = () => {
 
 
 const handleSaveFile = (saveResult: boolean, result: string) => {
-    if (saveResult) {
-        window.electron.ipcRenderer.send('read-file-main', result)
-        mainState.historicalFilesAdd(result)
-        mainState.changedefaultPath(path.value)
-        mainState.changeFile('isfile', true)
-        openValue.value = false
-        fileName.value = ''
-    } else {
+    if (!saveResult) {
         ElNotification.error({
             title: '提示',
             message: '新增失败',
             offset: 40
         })
+        return
     }
+    window.electron.ipcRenderer.invoke('read-file-main', result)
+        .then((res: string) => {
+            mainState.historicalFilesAdd(result)
+            mainState.changeDefaultPath(path.value)
+            mainState.changeFile('isfile', true)
+            handleReadFile(res)
+            openValue.value = false
+            fileName.value = ''
+        })
 }
 
 /**

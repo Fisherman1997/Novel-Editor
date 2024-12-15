@@ -28,7 +28,8 @@
     </div>
 </template>
 <script setup lang="ts">
-import { ref, computed, watch, unref } from 'vue'
+
+import { ref, computed, watch, unref, nextTick } from "vue";
 import { mainStore } from '../store/store.main'
 import { fileStore } from '../store/store.file'
 import { nextCxecute } from '@renderer/utils/common'
@@ -95,7 +96,9 @@ const totalAll = computed(() => {
     }
     return `全书${result}字`
 })
-
+watch(() => mainState.historicalFiles, () => {
+    nextTick(() => changeHtml(mainState.selectItem))
+})
 watch(() => mainState.selectItem, changeHtml)
 watch(
     () => mainState.isfile,
