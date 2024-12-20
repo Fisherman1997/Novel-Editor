@@ -8,7 +8,6 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     Content: typeof import('./src/components/Content.vue')['default']
-    Content_cancel: typeof import('./src/components/Content_cancel.vue')['default']
     ContentSet: typeof import('./src/components/module/ContentSet.vue')['default']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElColorPicker: typeof import('element-plus/es')['ElColorPicker']

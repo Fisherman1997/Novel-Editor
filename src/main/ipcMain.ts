@@ -1,5 +1,5 @@
 import { app, BrowserWindow, ipcMain, dialog, OpenDialogOptions, shell } from "electron";
-import { writeFile, readFileSync, existsSync, mkdirSync, openSync, closeSync } from 'fs'
+import { writeFile, readFileSync, existsSync, mkdirSync, closeSync } from 'fs'
 import { join } from "path";
 import { CurrentInfo, controlWindowType } from "../types/types";
 import { flock } from "fs-ext";
@@ -7,15 +7,15 @@ import { flock } from "fs-ext";
 
 
 export default () => {
-    interface currentFileType {
-        current: number | null,
-        path: string | null,
-    }
+    // interface currentFileType {
+    //     current: number | null,
+    //     path: string | null,
+    // }
     // 当前文件的id
-    let currentFile: currentFileType = {
-        current: null,
-        path: null,
-    }
+    // let currentFile: currentFileType = {
+    //     current: null,
+    //     path: null,
+    // }
 
     // 通用函数：确保文件夹存在
     const createDirIfNotExist = (dirPath: string) => {
@@ -156,18 +156,18 @@ export default () => {
     // 读取文件
     ipcMain.handle('read-file-main', (_event, filePath: string) => {
         try {
-            if (currentFile.current !== null) {
-                // chmodSync(currentFile.path as string, 0o666)
-                unlockFile(currentFile.current)
-                currentFile.current = null
-                currentFile.path = null
-            }
-            const result = readFileSync(filePath, 'utf-8')
-            currentFile.current = openSync(filePath,'r+')
-            currentFile.path = filePath
-            lockFile(currentFile.current)
+            // if (currentFile.current !== null) {
+            //     chmodSync(currentFile.path as string, 0o666)
+            //     unlockFile(currentFile.current)
+            //     currentFile.current = null
+            //     currentFile.path = null
+            // }
+            // const result = readFileSync(filePath, 'utf-8')
+            // currentFile.current = openSync(filePath,'r+')
+            // currentFile.path = filePath
+            // lockFile(currentFile.current)
             // chmodSync(filePath, 0o444)
-            return result
+            return readFileSync(filePath, 'utf-8')
         } catch(err) {
             dialog.showErrorBox('提示', '读取失败，请重新选择路径')
             console.error(err)
@@ -182,7 +182,7 @@ export default () => {
     // 保存文件
     ipcMain.handle('save-file-main', async (_event, filePath: string | string[], data: string): Promise<boolean> => {
         if ((<string>filePath).split('.').pop() !== 'xstxt') return false
-        return await writeFileAsync(<string>filePath, data)
+        return writeFileAsync(<string>filePath, data)
     })
 
     // 导出数据

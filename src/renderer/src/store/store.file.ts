@@ -73,13 +73,14 @@ export const fileStore = defineStore('fileInfo', {
             this.worldView = data.worldView
             this.character = data.character
         },
-        getJosnElement() {
+        getJsonElement() {
             const result = {
                 name: this.name,
                 volume: this.volume,
                 worldView: this.worldView,
                 character: this.character
             }
+            console.log('result', result)
             return JSON.stringify(result)
         },
         addVolume() {

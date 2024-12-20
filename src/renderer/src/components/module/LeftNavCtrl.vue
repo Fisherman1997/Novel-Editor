@@ -67,19 +67,19 @@ const handleReadFile = (data: string) => {
 }
 
 
-const handleReadFilePath = async (value: string, type: 'dir' | 'file') => {
+const handleReadFilePath = async (filePath: string, type: 'dir' | 'file') => {
     if (type === 'dir') {
-        console.log(value)
-        mainState.changeDefaultPath(value)
+        console.log(filePath)
+        mainState.changeDefaultPath(filePath)
     } else {
-        mainState.historicalFilesAdd(value)
-        const list = value.split('\\')
+        mainState.historicalFilesAdd(filePath)
+        const list = filePath.split('\\')
         list.pop()
         mainState.changeDefaultPath(list.join('\\'))
         mainState.changeFile('isChangeFile', false)
         mainState.changeFile('isfile', true)
         // console.log(value)
-        const fileStateElement = await window.electron.ipcRenderer.invoke('read-file-main', value)
+        const fileStateElement = await window.electron.ipcRenderer.invoke('read-file-main', filePath)
         if (typeof fileStateElement !== "string") return
         handleReadFile(fileStateElement)
     }
@@ -89,9 +89,9 @@ const handleReadFilePath = async (value: string, type: 'dir' | 'file') => {
  * 打开文件
  */
 const openFile = async () => {
-    const result = await window.electron.ipcRenderer.invoke('read-file-path-main', path.value, 'file')
-    if(typeof result !== 'string') return
-    await handleReadFilePath(result, 'file')
+    const filePath = await window.electron.ipcRenderer.invoke('read-file-path-main', path.value, 'file')
+    if(typeof filePath !== 'string') return
+    await handleReadFilePath(filePath, 'file')
 }
 
 /**
@@ -145,14 +145,14 @@ const saveEnter = async () => {
         })
         return
     }
-    const result = `${path.value}\\${fileName.value}.xstxt`
-
+    const filePath = `${path.value}\\${fileName.value}.xstxt`
+    console.log(JSON.stringify(new CurrentInfo(fileName.value)))
     const saveResult = await window.electron.ipcRenderer.invoke(
         'save-file-main',
-        result,
+        filePath,
         JSON.stringify(new CurrentInfo(fileName.value))
     ) as boolean
-    handleSaveFile(saveResult, result)
+    handleSaveFile(saveResult, filePath)
 }
 
 
@@ -172,12 +172,16 @@ const changePath = async () => {
 const save = async () => {
     if (!mainState.isfile) return
     if (!mainState.isChangeFile) return
-    await window.electron.ipcRenderer.invoke(
+    window.electron.ipcRenderer.invoke(
         'save-file-main',
         mainState.historicalFiles[0],
-        fileState.getJosnElement()
-    )
-    mainState.changeFile('isChangeFile', false)
+        fileState.getJsonElement()
+    ).then((res: boolean) => {
+        if (!res) {
+            return
+        }
+        mainState.changeFile('isChangeFile', false)
+    })
 }
 
 // 监听是否是通过文件打开
