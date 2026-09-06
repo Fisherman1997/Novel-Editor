@@ -6,5 +6,5 @@ ttf
 .idea
 .vs
 *.tsbuildinfo
-*.mjs\
+*.mjs
 .vscode

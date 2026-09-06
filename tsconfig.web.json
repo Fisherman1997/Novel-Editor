@@ -1,10 +1,14 @@
 {
     "compilerOptions": {
         "composite": true,
+        "ignoreDeprecations": "5.0",
         "baseUrl": ".",
         "paths": {
             "@renderer/*": [
                 "src/renderer/src/*"
+            ],
+            "@shared/*": [
+                "src/shared/*"
             ]
         },
         "types": [
@@ -19,6 +23,6 @@
         "src/renderer/src/**/**/*.vue",
         "src/renderer/src/**/*.ts",
         "src/preload/*.d.ts",
-        "src/types/*"
+        "src/shared/**/*"
     ]
 }

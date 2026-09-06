@@ -1,14 +1,38 @@
 import { ElectronAPI } from '@electron-toolkit/preload'
-type controlWindowType = 'close' | 'show' | 'hide' | 'maximize' | 'minimize' | 'restore'
+import { WindowAction, FileResult, ExportConfig } from '../shared/types'
 
-interface ApiType {
-    newWin(url: string): void
-    changeWindow: (type: controlWindowType) => void
-    desktopPath: () => Promise<string>
+interface Api {
+  // 文件操作
+  readFile: (path: string) => Promise<FileResult>
+  writeFile: (path: string, data: string) => Promise<FileResult>
+  selectFile: (defaultPath: string) => Promise<FileResult>
+  selectDirectory: (defaultPath: string) => Promise<FileResult>
+  exportNovel: (config: ExportConfig) => Promise<FileResult>
+
+  // 窗口控制
+  windowControl: (action: WindowAction) => void
+
+  // 系统
+  getDesktopPath: () => Promise<string>
+  getStartupFile: () => Promise<string | null>
+
+  // 事件监听
+  onFileOpen: (callback: (path: string) => void) => () => void
+
+  // 渲染进程错误上报
+  reportError: (message: string, stack?: string, info?: string) => void
+
+  // 日志
+  readLogs: () => Promise<string>
+  clearLogs: () => Promise<void>
+  getLogPath: () => Promise<string>
 }
+
 declare global {
   interface Window {
     electron: ElectronAPI
-    api: ApiType
+    api: Api
   }
 }
+
+export {}
