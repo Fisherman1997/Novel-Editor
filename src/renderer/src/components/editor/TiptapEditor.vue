@@ -242,6 +242,32 @@ watch(
     }
 )
 
+// 创建标注确认后：在捕获的选区上打 annotation mark（触发 onUpdate 写回 HTML）
+watch(
+    () => editorStore.pendingAnnotationMark?.nonce,
+    async () => {
+        const mark = editorStore.pendingAnnotationMark
+        if (!mark || !editor.value) return
+        await nextTick()
+        const { from, to } = mark
+        const docSize = editor.value.state.doc.content.size
+        if (from < 0 || to > docSize || from >= to) {
+            editorStore.clearPendingAnnotationMark()
+            return
+        }
+        const ok = editor.value
+            .chain()
+            .focus()
+            .setTextSelection({ from, to })
+            .setAnnotation({ annotationId: mark.annotationId, color: mark.color })
+            .run()
+        editorStore.clearPendingAnnotationMark()
+        if (!ok) {
+            console.warn('标注 mark 应用失败', mark.annotationId)
+        }
+    }
+)
+
 // 监听搜索滚动定位
 watch(
     () => editorStore.pendingScroll,

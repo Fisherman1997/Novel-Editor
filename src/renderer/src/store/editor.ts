@@ -53,6 +53,15 @@ interface EditorState {
         editTarget: AnnotationEditTarget | null
     }
 
+    // 待应用到正文的标注 mark（创建确认后由 TiptapEditor 消费）
+    pendingAnnotationMark: {
+        annotationId: string
+        color: string
+        from: number
+        to: number
+        nonce: number
+    } | null
+
     // 搜索结果跳转定位
     pendingScroll: PendingScroll | null
 
@@ -91,6 +100,8 @@ export const useEditorStore = defineStore('editor', {
             createSelection: null,
             editTarget: null
         },
+
+        pendingAnnotationMark: null,
 
         pendingScroll: null,
 
@@ -187,6 +198,20 @@ export const useEditorStore = defineStore('editor', {
             this.annotationDialog.editTarget = null
         },
 
+        // 创建确认后：请求编辑器给选区打上 annotation mark
+        setPendingAnnotationMark(mark: {
+            annotationId: string
+            color: string
+            from: number
+            to: number
+        }) {
+            this.pendingAnnotationMark = { ...mark, nonce: Date.now() + Math.random() }
+        },
+
+        clearPendingAnnotationMark() {
+            this.pendingAnnotationMark = null
+        },
+
         // 重置编辑器状态
         reset() {
             this.isReady = false
@@ -214,6 +239,7 @@ export const useEditorStore = defineStore('editor', {
                 createSelection: null,
                 editTarget: null
             }
+            this.pendingAnnotationMark = null
             this.pendingScroll = null
         }
     }

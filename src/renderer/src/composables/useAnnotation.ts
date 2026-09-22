@@ -82,6 +82,8 @@ export function useAnnotation() {
             mainStore.selectedChapterIndex,
             annotationId
         )
+        // store 里的 HTML 已变，让打开中的编辑器重载，否则 mark 仍显示
+        editorStore.requestContentReload()
     }
 
     const updateAnnotation = (annotationId: string, data: Partial<Annotation>) => {
@@ -100,6 +102,8 @@ export function useAnnotation() {
             annotationId,
             color
         )
+        // 颜色写在正文 mark 的 style 上，需重载编辑器才能看到变化
+        editorStore.requestContentReload()
     }
 
     const linkToCharacter = (annotationId: string, characterId: string) => {

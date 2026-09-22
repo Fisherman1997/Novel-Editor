@@ -39,6 +39,7 @@
     "@vueuse/core": "^10.0.0",
     "electron-updater": "^6.1.0",
     "element-plus": "^2.4.3",
+    "markdown-it": "^15.0.2",
     "pinia": "^2.1.7",
     "uuid": "^9.0.0"
   },

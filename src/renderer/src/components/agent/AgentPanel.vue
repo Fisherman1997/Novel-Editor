@@ -125,8 +125,14 @@
                     :class="`is-${msg.role}`"
                 >
                     <div class="bubble">
-                        <div class="bubble-content">
-                            <span>{{ msg.content }}</span>
+                        <div
+                            class="bubble-content"
+                            :class="msg.role === 'assistant' ? 'is-markdown' : 'is-plain'"
+                        >
+                            <template v-if="msg.role === 'assistant'">
+                                <div class="md-body" v-html="renderMarkdown(msg.content)" />
+                            </template>
+                            <template v-else>{{ msg.content }}</template>
                             <span
                                 v-if="isStreamingLast(msg)"
                                 class="stream-cursor"
@@ -265,6 +271,7 @@ import { ElMessage } from 'element-plus'
 import { useNovelStore, useAgentConfigStore } from '../../store'
 import { useAgentChat } from '../../composables/useAgentChat'
 import { QUICK_PROMPTS } from '../../utils/agentPrompt'
+import { renderMarkdown } from '../../utils/markdown'
 import { confirmAction, promptInput } from '../../utils/confirm'
 import { getScopeLabel } from '../../utils/agentContext'
 import type { AgentContextScope, AgentConfig, AgentMessage } from '@shared/types'
@@ -653,8 +660,132 @@ const saveSettings = () => {
     box-shadow: var(--shadow-sm);
 
     .bubble-content {
-        white-space: pre-wrap;
         word-break: break-word;
+
+        &.is-plain {
+            white-space: pre-wrap;
+        }
+
+        &.is-markdown {
+            white-space: normal;
+            font-size: @font-size-base;
+            line-height: @line-height-normal;
+
+            :deep(p) {
+                margin: 0 0 6px;
+            }
+
+            :deep(p:last-child) {
+                margin-bottom: 0;
+            }
+
+            :deep(h1),
+            :deep(h2),
+            :deep(h3),
+            :deep(h4),
+            :deep(h5),
+            :deep(h6) {
+                margin: 10px 0 6px;
+                font-weight: @font-weight-semibold;
+                line-height: @line-height-tight;
+            }
+
+            :deep(h1) {
+                font-size: @font-size-lg;
+            }
+
+            :deep(h2) {
+                font-size: @font-size-md;
+            }
+
+            :deep(h3),
+            :deep(h4),
+            :deep(h5),
+            :deep(h6) {
+                font-size: @font-size-base;
+            }
+
+            :deep(ul),
+            :deep(ol) {
+                margin: 4px 0 6px;
+                padding-left: 1.4em;
+            }
+
+            :deep(li) {
+                margin: 2px 0;
+            }
+
+            :deep(li > ul),
+            :deep(li > ol) {
+                margin: 2px 0;
+            }
+
+            :deep(code) {
+                padding: 1px 4px;
+                border-radius: @radius-sm;
+                background: var(--bg-inset);
+                font-family: @font-mono;
+                font-size: 0.92em;
+            }
+
+            :deep(pre) {
+                margin: 6px 0;
+                padding: 8px 10px;
+                border-radius: @radius-md;
+                background: var(--bg-inset);
+                overflow-x: auto;
+
+                code {
+                    padding: 0;
+                    background: none;
+                    font-size: @font-size-sm;
+                }
+            }
+
+            :deep(blockquote) {
+                margin: 6px 0;
+                padding: 2px 10px;
+                border-left: 3px solid var(--border-strong, var(--border));
+                color: var(--text-2);
+            }
+
+            :deep(a) {
+                color: var(--accent);
+                text-decoration: underline;
+                text-underline-offset: 2px;
+            }
+
+            :deep(strong) {
+                font-weight: @font-weight-semibold;
+            }
+
+            :deep(hr) {
+                margin: 8px 0;
+                border: none;
+                border-top: 1px solid var(--border);
+            }
+
+            :deep(table) {
+                margin: 6px 0;
+                border-collapse: collapse;
+                font-size: @font-size-sm;
+
+                th,
+                td {
+                    padding: 4px 8px;
+                    border: 1px solid var(--border);
+                }
+
+                th {
+                    background: var(--bg-inset);
+                    font-weight: @font-weight-medium;
+                }
+            }
+
+            :deep(img) {
+                max-width: 100%;
+            }
+        }
     }
 
     .msg-error {

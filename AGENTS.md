@@ -23,14 +23,14 @@ npm run test:coverage
 
 Three-process Electron layout under `src/`:
 
-- `src/main/` — main process entry `index.ts`; IPC handlers in `src/main/ipc/` (`file.ts`, `window.ts`, `system.ts`), registered via `ipc/index.ts`.
+- `src/main/` — main process entry `index.ts`; IPC handlers in `src/main/ipc/` (`file.ts`, `window.ts`, `system.ts`, `agent.ts`), registered via `ipc/index.ts`.
 - `src/preload/` — exposes `window.api` (typed in `index.d.ts`); all renderer→main calls go through this bridge.
 - `src/renderer/src/` — Vue 3 app entry `main.ts`; root `App.vue`.
-- `src/shared/` — types (`types.ts`, includes `IPC_CHANNELS`) and `.xstxt` migration (`migration.ts`). Shared by all three processes.
+- `src/shared/` — types (`types.ts`, includes `IPC_CHANNELS`) and `.xstxt` migration (`migration.ts`, book format v4). Shared by all three processes.
 
 Path aliases (configured in `electron.vite.config.ts` and `vitest.config.ts`): `@shared` → `src/shared`, `@renderer` → `src/renderer/src`. Use them; do not use deep relative imports across process boundaries.
 
-State: three Pinia stores in `src/renderer/src/store/` — `main` (UI/config), `novel` (book data), `editor` (search/annotation targeting). Config persists to `localStorage`.
+State: four Pinia stores in `src/renderer/src/store/` — `main` (UI/config), `novel` (book data + AI agent sessions), `editor` (search/annotation targeting), `agentConfig` (LLM connection config). Config persists to `localStorage`.
 
 ## Conventions & gotchas
 
@@ -39,6 +39,8 @@ State: three Pinia stores in `src/renderer/src/store/` — `main` (UI/config), `
 - **Annotations** are Tiptap marks in content HTML + metadata in `chapter.annotations[]`. Keep both in sync via the novel store / `useAnnotation`; never edit one side alone.
 - **`.xstxt` files are JSON**. Old singular field names are migrated in `src/shared/migration.ts` (`parseAndMigrate`); always load through it, never `JSON.parse` directly.
 - Renderer config uses `window.api.*` only (defined in preload). Main process must not be imported from renderer code.
+- **AI assistant iron rule: the agent never writes book content.** No IPC channel mutates `chapter.content`; the UI offers copy only (no "apply to chapter"); context is frozen as plain-text snapshots (`utils/agentContext.ts`) — never store references. LLM calls go main-process only (`ipc/agent.ts`, SSE) because renderer CSP blocks external requests; never log `apiKey`.
+- **LLM config** (`baseUrl`/`apiKey`/`model`/…) lives in `localStorage['agent-config']` (`store/agentConfig.ts`) and must never be written into `.xstxt`.
 - Vitest: `tests/**/*.test.ts`, environment `happy-dom`. Coverage excludes `src/main/**` and `src/preload/**`.
 - No CI workflows in this repo — run lint/typecheck/test locally.
 - Existing agent guidance also lives in `CLAUDE.md`; prefer executable config (`package.json`, `*.config.ts`) if they conflict.

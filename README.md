@@ -25,6 +25,15 @@
 - 🌍 **世界观设定** - 世界背景、魔法系统、势力关系等设定
 - 📋 **卷章说明** - 为每一卷和每一章添加说明备注
 
+### AI 写作助手
+
+- 🤖 **右侧栏「助手」页签** - 多会话管理（新建/切换/重命名/删除/置顶），会话随书保存
+- 💬 **流式对话** - 逐字输出、生成中可停止、错误可见可重试；同一时刻仅一个请求
+- 🎯 **三种上下文范围** - 大纲 / 当前章 / 全书；首次发送时冻结纯文本快照，支持手动「刷新上下文」
+- ⚡ **快捷指令** - 续写本章、润色选段、检查伏笔、生成下一章大纲、人设一致性
+- 🔒 **永不改稿铁律** - AI 只输出建议，不提供「应用到章节」，仅可复制；API Key 只存本机 localStorage，不写入 `.xstxt`
+- 🌐 **兼容 OpenAI 接口** - 配置 Base URL / API Key / Model / Temperature / Max Tokens，支持任意 OpenAI 兼容服务（含自建部署）
+
 ### 编辑器特性
 
 - 🎨 **自定义主题** - 字体大小、字体、颜色、背景色、行高可调
@@ -88,7 +97,13 @@ npm run build:linux
    - 添加角色并填写信息
    - 点击"设定"标签管理世界观
 
-4. **导出小说**
+4. **使用 AI 助手**
+   - 点击右侧面板的"助手"标签
+   - 打开"设置"，填写 Base URL、API Key、模型名（任意 OpenAI 兼容服务）
+   - 新建会话，选择上下文范围（大纲/当前章/全书），开始提问
+   - 对回复满意时点"复制"，手动粘贴进书稿 —— 助手永远不会替你改稿
+
+5. **导出小说**
    - 点击编辑器底部的"导出"按钮
    - 选择导出类型（全书/按卷/按章）
    - 选择导出路径
@@ -145,9 +160,37 @@ npm run build:linux
       "settings": ["要点1", "要点2"],
       "content": "详细描述"
     }
-  ]
+  ],
+  "agent": {
+    "sessions": [
+      {
+        "id": "uuid",
+        "title": "会话标题",
+        "createdAt": 1700000000000,
+        "updatedAt": 1700000000000,
+        "pinned": false,
+        "contextScope": "outline",
+        "context": {
+          "capturedAt": 1700000000000,
+          "scope": "outline",
+          "bookName": "小说名称",
+          "outline": "冻结的大纲纯文本…",
+          "materials": "人物与世界观纯文本…",
+          "truncation": { "truncated": false, "originalChars": 0, "keptChars": 0 }
+        },
+        "messages": [
+          { "id": "uuid", "role": "user", "content": "提问", "createdAt": 1700000000000 },
+          { "id": "uuid", "role": "assistant", "content": "建议回复", "createdAt": 1700000000000 }
+        ]
+      }
+    ],
+    "activeSessionId": "uuid"
+  },
+  "_version": 4
 }
 ```
+
+> 说明：`agent` 为 AI 助手的会话/消息/上下文快照，随书保存；模型连接配置（`baseUrl`/`apiKey` 等）仅存本机 `localStorage`，**不会**出现在此文件中。旧版文件打开时自动迁移到 v4 并补全空的 `agent` 结构。
 
 ## 📤 导出格式
 
@@ -205,10 +248,10 @@ src/
 │   └── index.d.ts         # 类型定义
 └── renderer/               # 渲染进程
     └── src/
-        ├── components/    # Vue 组件
-        ├── store/         # Pinia 状态
-        ├── composables/   # 组合式函数
-        └── utils/         # 工具函数
+        ├── components/    # Vue 组件（含 agent/ 助手面板）
+        ├── store/         # Pinia 状态（含 agentConfig LLM 配置）
+        ├── composables/   # 组合式函数（含 useAgentChat 流式对话）
+        └── utils/         # 工具函数（含 agentPrompt / agentContext）
 ```
 
 ### 可用命令

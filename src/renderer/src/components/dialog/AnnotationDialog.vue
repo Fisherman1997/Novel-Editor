@@ -135,7 +135,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, nextTick } from 'vue'
 import { useNovelStore, useEditorStore } from '../../store'
 import { useAnnotation } from '../../composables'
 import { AnnotationType } from '@shared/types'
@@ -196,9 +196,14 @@ const getAnnotationText = (): string => {
 }
 
 // 打开对话框时填充当前值
+// isFilling：程序化填充期间忽略 annotationType watcher，避免它把刚填入的
+// 内容清空（编辑备注时 type 从 highlight → note 会触发该 watcher 的竞态）
+let isFilling = false
+
 watch(dialogOpen, (open) => {
     if (!open) return
 
+    isFilling = true
     if (dialogMode.value === 'edit' && editingAnnotation.value) {
         const ann = editingAnnotation.value
         annotationType.value = ann.type
@@ -216,6 +221,9 @@ watch(dialogOpen, (open) => {
         selectedVolumeIndex.value = 0
         selectedChapterIndex.value = 0
     }
+    nextTick(() => {
+        isFilling = false
+    })
 })
 
 const canConfirm = computed(() => {
@@ -234,13 +242,23 @@ const canConfirm = computed(() => {
 
 const handleConfirm = () => {
     if (dialogMode.value === 'create') {
-        // 创建标注
+        // 先取出选区：addAnnotation 内部会 closeDialog 清空 createSelection
+        const sel = editorStore.annotationDialog.createSelection
         const ann = addAnnotation(
             annotationType.value,
             annotationContent.value,
             highlightColor.value
         )
         if (ann) {
+            // 请求编辑器在选区上打 annotation mark（正文可视化 + 列表预览依赖 mark）
+            if (sel) {
+                editorStore.setPendingAnnotationMark({
+                    annotationId: ann.id,
+                    color: ann.color || highlightColor.value,
+                    from: sel.from,
+                    to: sel.to
+                })
+            }
             // 链接目标
             if (annotationType.value === 'link') {
                 if (selectedCharacterId.value) {
@@ -282,12 +300,20 @@ const handleDelete = async () => {
     }
 }
 
-watch(annotationType, () => {
-    annotationContent.value = ''
-    selectedCharacterId.value = ''
-    selectedVolumeIndex.value = 0
-    selectedChapterIndex.value = 0
-})
+// 用户主动切换类型时清空内容/链接选择。
+// flush: 'sync' —— 打开对话框的程序化赋值发生在 isFilling=true 期间，同步触发才能被拦住；
+// 若用默认异步 flush，可能晚于 isFilling 复位，把刚填入的备注内容清掉。
+watch(
+    annotationType,
+    () => {
+        if (isFilling) return
+        annotationContent.value = ''
+        selectedCharacterId.value = ''
+        selectedVolumeIndex.value = 0
+        selectedChapterIndex.value = 0
+    },
+    { flush: 'sync' }
+)
 </script>
 
 <style scoped lang="less">
