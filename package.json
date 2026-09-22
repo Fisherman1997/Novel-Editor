@@ -1,6 +1,6 @@
 {
   "name": "novel-editor",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "小说编辑器 - 功能完善的桌面写作工具",
   "main": "./out/main/index.js",
   "author": "Fisherman1997",
