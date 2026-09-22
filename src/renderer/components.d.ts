@@ -7,6 +7,7 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    AgentPanel: typeof import('./src/components/agent/AgentPanel.vue')['default']
     AnnotationDialog: typeof import('./src/components/dialog/AnnotationDialog.vue')['default']
     AnnotationList: typeof import('./src/components/novel/AnnotationList.vue')['default']
     AppHeader: typeof import('./src/components/layout/AppHeader.vue')['default']
@@ -20,6 +21,7 @@ declare module 'vue' {
     ElCheckTag: typeof import('element-plus/es')['ElCheckTag']
     ElDialog: typeof import('element-plus/es')['ElDialog']
     ElInput: typeof import('element-plus/es')['ElInput']
+    ElInputNumber: typeof import('element-plus/es')['ElInputNumber']
     ElOption: typeof import('element-plus/es')['ElOption']
     ElRadioButton: typeof import('element-plus/es')['ElRadioButton']
     ElRadioGroup: typeof import('element-plus/es')['ElRadioGroup']

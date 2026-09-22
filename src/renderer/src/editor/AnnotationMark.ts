@@ -3,63 +3,65 @@
 import { Mark, mergeAttributes } from '@tiptap/core'
 
 export interface AnnotationMarkAttrs {
-  annotationId: string | null
-  color: string
+    annotationId: string | null
+    color: string
 }
 
 declare module '@tiptap/core' {
-  interface Commands<ReturnType> {
-    annotation: {
-      setAnnotation: (attrs: AnnotationMarkAttrs) => ReturnType
-      unsetAnnotation: () => ReturnType
+    interface Commands<ReturnType> {
+        annotation: {
+            setAnnotation: (attrs: AnnotationMarkAttrs) => ReturnType
+            unsetAnnotation: () => ReturnType
+        }
     }
-  }
 }
 
 export const AnnotationMark = Mark.create({
-  name: 'annotation',
+    name: 'annotation',
 
-  // 光标移到标注边缘时不自动延续标注
-  inclusive: false,
+    // 光标移到标注边缘时不自动延续标注
+    inclusive: false,
 
-  addAttributes() {
-    return {
-      annotationId: {
-        default: null,
-        parseHTML: element => element.getAttribute('data-annotation-id'),
-        renderHTML: attributes => ({ 'data-annotation-id': attributes.annotationId })
-      },
-      color: {
-        default: '#ffeb3b',
-        parseHTML: element =>
-          element.getAttribute('data-color') || element.style.backgroundColor || '#ffeb3b',
-        renderHTML: attributes => ({
-          'data-color': attributes.color,
-          style: `background-color: ${attributes.color}`
-        })
-      }
+    addAttributes() {
+        return {
+            annotationId: {
+                default: null,
+                parseHTML: (element) => element.getAttribute('data-annotation-id'),
+                renderHTML: (attributes) => ({ 'data-annotation-id': attributes.annotationId })
+            },
+            color: {
+                default: '#ffeb3b',
+                parseHTML: (element) =>
+                    element.getAttribute('data-color') ||
+                    element.style.backgroundColor ||
+                    '#ffeb3b',
+                renderHTML: (attributes) => ({
+                    'data-color': attributes.color,
+                    style: `background-color: ${attributes.color}`
+                })
+            }
+        }
+    },
+
+    parseHTML() {
+        // 只认带 data-annotation-id 的 mark，避免与 Highlight 扩展的 <mark> 冲突
+        return [{ tag: 'mark[data-annotation-id]' }]
+    },
+
+    renderHTML({ HTMLAttributes }) {
+        return ['mark', mergeAttributes(HTMLAttributes), 0]
+    },
+
+    addCommands() {
+        return {
+            setAnnotation:
+                (attrs) =>
+                ({ commands }) =>
+                    commands.setMark('annotation', attrs),
+            unsetAnnotation:
+                () =>
+                ({ commands }) =>
+                    commands.unsetMark('annotation')
+        }
     }
-  },
-
-  parseHTML() {
-    // 只认带 data-annotation-id 的 mark，避免与 Highlight 扩展的 <mark> 冲突
-    return [{ tag: 'mark[data-annotation-id]' }]
-  },
-
-  renderHTML({ HTMLAttributes }) {
-    return ['mark', mergeAttributes(HTMLAttributes), 0]
-  },
-
-  addCommands() {
-    return {
-      setAnnotation:
-        attrs =>
-        ({ commands }) =>
-          commands.setMark('annotation', attrs),
-      unsetAnnotation:
-        () =>
-        ({ commands }) =>
-          commands.unsetMark('annotation')
-    }
-  }
 })

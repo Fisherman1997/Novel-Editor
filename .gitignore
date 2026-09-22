@@ -8,3 +8,5 @@ ttf
 *.tsbuildinfo
 *.mjs
 .vscode
+.zcode
+.claude
